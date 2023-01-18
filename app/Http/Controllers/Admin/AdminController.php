@@ -122,7 +122,14 @@ class AdminController extends Controller
     {
         PermissionUser::where('admin_id',$id)->delete();
         Admin::find($id)->delete();
+    }
 
+    public function multiAdminDelete(Request $request)
+    {
+        $ids = $request->ids;
+        Admin::whereIn('id',explode(",",$ids))->delete();
+
+        return response()->json(['status' => true, 'message' => "Records deleted successfully."]);
     }
 
 }

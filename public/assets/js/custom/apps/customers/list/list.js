@@ -1,22 +1,22 @@
 var datatable;
-$(document).on('click', '.delete', function (e){
+$(document).on('click', '.delete', function (e) {
     Swal.fire({
-            title: 'هل انت متأكد؟',
-            text: "لن تتمكن من التراجع عن هذا!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'نعم احذفها!',
-            cancelButtonText: 'الغاء',
+        title: 'هل انت متأكد؟',
+        text: "لن تتمكن من التراجع عن هذا!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'نعم احذفها!',
+        cancelButtonText: 'الغاء',
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
                 url: $(this).data('url'),
                 type: 'POST',
                 data: {
-                    _method : 'DELETE',
-                    _token : $('meta[name="csrf-token"]').attr('content')
+                    _method: 'DELETE',
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (res) {
                     console.log(res)
@@ -73,13 +73,13 @@ var KTCustomersList = function () {
                 url: '/admin/admins',
             },
             columns: [
-                { data: 'id' },
-                { data: 'name' },
-                { data: 'email' },
-                { data: 'mobile_number' },
-                { data: 'role.name' ,searchable: false},
+                {data: 'id'},
+                {data: 'name'},
+                {data: 'email'},
+                {data: 'mobile_number'},
+                {data: 'role.name', searchable: false},
                 // { data: null ,orderable: false ,searchable: false},
-                { data: 'id' },
+                {data: 'id'},
             ],
             columnDefs: [
                 {
@@ -89,7 +89,7 @@ var KTCustomersList = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
+                                <input class="form-check-input checkbox" type="checkbox" data-id="${data}" value="${data}" />
                             </div>`;
                     }
                 },
@@ -263,7 +263,12 @@ var KTCustomersList = function () {
         });
 
         // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
+        $('.delete-all').on('click', function (e) {
+            var idsArr = [];
+            $(".checkbox:checked").each(function () {
+                idsArr.push($(this).attr('data-id'));
+            });
+            var strIds = idsArr.join(",");
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
             Swal.fire({
                 text: "Are you sure you want to delete selected customers?",
@@ -279,37 +284,21 @@ var KTCustomersList = function () {
             }).then(function (result) {
                 if (result.value) {
                     $.ajax({
-                        url: $(this).data('url'),
-                        type: 'POST',
-                        data: {
-                            _method : 'DELETE',
-                            _token : $('meta[name="csrf-token"]').attr('content')
+                        url: "/admin/multiAdminDelete",
+                        type: 'DELETE',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: 'ids=' + strIds,
+                        success: function (data) {
+                            console.log(data)
+                            const parent = e.target.closest('tr');
+                            datatable.row($(parent)).remove().draw();
                         },
-                        success: function (res) {
-                            Swal.fire({
-                                text: "You have deleted all selected customers!.",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn fw-bold btn-primary",
-                                }
-                            }).then(function () {
+                        error: function (data) {
+                            console.log(data)
+                        }
+                    });
 
-                                // Remove all selected customers
-                                checkboxes.forEach(c => {
-                                    if (c.checked) {
-                                        datatable.row($(c.closest('tbody tr'))).remove().draw();
-                                    }
-                                });
-
-                                // Remove header checked box
-                                const headerCheckbox = table.querySelectorAll('[type="checkbox"]')[0];
-                                headerCheckbox.checked = false;
-
-
-                            });
-                        }})
+                    // });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
                         text: "Selected customers was not deleted.",

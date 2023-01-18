@@ -23,4 +23,9 @@ class Product extends Model
         }
         return $enum;
     }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
