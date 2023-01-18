@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html direction="rtl" dir="rtl" style="direction: rtl" >
 	<head><base href="">
-		<title>رنه</title>
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <title>رنه</title>
         @include('admin.layouts.css')
 	</head>
 	<body id="kt_body" class="header-fixed header-tablet-and-mobile-fixed toolbar-enabled toolbar-fixed toolbar-tablet-and-mobile-fixed aside-enabled aside-fixed" style="--kt-toolbar-height:55px;--kt-toolbar-height-tablet-and-mobile:55px">

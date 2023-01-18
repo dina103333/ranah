@@ -65,7 +65,7 @@ Route::group([
     Route::resource('/companies', CompanyController::class);
     Route::get('/get-companies', [CompanyController::class, 'getcompanies'])->name('get-companies');
 
-    Route::get('/products/export/', [ProductController::class, 'export'])->name('products.export');
+    Route::post('/products/export/', [ProductController::class, 'export'])->name('products.export');
     Route::resource('/products', ProductController::class);
     Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get-products');
     Route::get('/get-categories/{company_id}', [ProductController::class, 'getCompanyCategories'])->name('get-categories');
