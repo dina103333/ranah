@@ -93,7 +93,7 @@
 </div>
 <div class="menu-item">
     <a class="menu-link "
-         href="#">
+         href="{{route('admin.drivers.index')}}">
         <span class="menu-icon">
             <i class="bi bi-grid fs-3"></i>
         </span>
@@ -102,7 +102,7 @@
 </div>
 <div class="menu-item">
     <a class="menu-link "
-         href="#">
+         href="{{route('admin.sellers.index')}}">
         <span class="menu-icon">
             <i class="bi bi-grid fs-3"></i>
         </span>

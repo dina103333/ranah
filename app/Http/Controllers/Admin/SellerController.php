@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exports\DriversExport;
+use App\Exports\SellersExport;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\DriverRequest;
-use App\Models\Driver;
+use App\Http\Requests\Admin\SellerRequest;
+use App\Models\Seller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
-class DriverController extends Controller
+class SellerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,14 +18,14 @@ class DriverController extends Controller
      */
     public function index()
     {
-        $drivers = Driver::latest()->paginate('10');
-        return view('admin.drivers.index',compact('drivers'));
+        $sellers = Seller::latest()->paginate('10');
+        return view('admin.sellers.index',compact('sellers'));
     }
 
-    public function getDrivers()
+    public function getSellers()
     {
-        $drivers = Driver::latest()->select('id','name', 'mobile_number', 'address');
-        return datatables($drivers)->make(true);
+        $sellers = Seller::latest()->select('id','name', 'mobile_number', 'address');
+        return datatables($sellers)->make(true);
     }
 
     /**
@@ -35,8 +35,8 @@ class DriverController extends Controller
      */
     public function create()
     {
-        $status = Driver::getEnumValues('drivers','status');
-        return view('admin.drivers.create',compact('status'));
+        $status = Seller::getEnumValues('sellers','status');
+        return view('admin.sellers.create',compact('status'));
     }
 
     /**
@@ -45,9 +45,9 @@ class DriverController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(DriverRequest $request)
+    public function store(SellerRequest $request)
     {
-        $driver = Driver::create([
+        $seller = Seller::create([
             'name' =>$request->name,
             'mobile_number' =>$request->mobile,
             'password' => bcrypt($request->password),
@@ -55,73 +55,73 @@ class DriverController extends Controller
             'address' =>$request->address,
         ]);
 
-        return redirect()->route('admin.drivers.index')->with('success','تم اضافه سائق بنجاح');
+        return redirect()->route('admin.sellers.index')->with('success','تم اضافه بائع بنجاح');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Driver  $driver
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function show(Driver $driver)
+    public function show(Seller $seller)
     {
-        //
+       //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Driver  $driver
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function edit(Driver $driver)
+    public function edit(Seller $seller)
     {
-        $status = Driver::getEnumValues('drivers','status');
-        return view('admin.drivers.edit',compact('driver','status'));
+        $status = Seller::getEnumValues('sellers','status');
+        return view('admin.sellers.edit',compact('seller','status'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Driver  $driver
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Driver $driver)
+    public function update(SellerRequest $request, Seller $seller)
     {
-        $driver->update([
+        $seller->update([
             'name' =>$request->name,
             'mobile_number' =>$request->mobile,
-            'password' => $request->password ? bcrypt($request->password) : $driver->password,
+            'password' => $request->password ? bcrypt($request->password) : $seller->password,
             'status' =>$request->status,
             'address' =>$request->address,
         ]);
 
-        return redirect(route('admin.drivers.index'))->with('success','تم تعديل سائق بنجاح');
+        return redirect(route('admin.sellers.index'))->with('success','تم تعديل بائع بنجاح');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Driver  $driver
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Driver $driver)
+    public function destroy(Seller $seller)
     {
-        $driver->delete();
+        $seller->delete();
     }
 
     public function multiDriversDelete(Request $request)
     {
         $ids = $request->ids;
-        Driver::whereIn('id',explode(",",$ids))->delete();
+        Seller::whereIn('id',explode(",",$ids))->delete();
 
         return response()->json(['status' => true, 'message' => "Records deleted successfully."]);
     }
 
     public function export()
     {
-        return Excel::download(new DriversExport, 'drivers.xlsx');
+        return Excel::download(new SellersExport, 'sellers.xlsx');
     }
 }

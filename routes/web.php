@@ -6,8 +6,10 @@ use App\Http\Controllers\Admin\Auth\ForgetpasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\DriverController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SellerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -72,4 +74,14 @@ Route::group([
     Route::get('/change-quantity', [ProductController::class, 'changeQuantityStatus'])->name('change-quantity');
     Route::get('/change-status', [ProductController::class, 'changeStatus'])->name('change-status');
     Route::get('/update-product-quantity', [ProductController::class, 'updateProductQuantity'])->name('update-product-quantity');
+
+    Route::post('/drivers/export/', [DriverController::class, 'export'])->name('drivers.export');
+    Route::resource('/drivers', DriverController::class);
+    Route::delete('/multiDriversDelete', [DriverController::class, 'multiDriversDelete']);
+    Route::get('/get-drivers', [DriverController::class, 'getDrivers'])->name('get-drivers');
+
+    Route::post('/sellers/export/', [SellerController::class, 'export'])->name('sellers.export');
+    Route::resource('/sellers', SellerController::class);
+    Route::delete('/multiSellersDelete', [SellerController::class, 'multiSellersDelete']);
+    Route::get('/get-sellers', [SellerController::class, 'getSellers'])->name('get-sellers');
 });
