@@ -58,7 +58,7 @@ var KTCustomersList = function () {
 
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
-            responsive: true,
+            // responsive: true,
             searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -77,8 +77,8 @@ var KTCustomersList = function () {
                 { data: 'name' },
                 { data: 'email' },
                 { data: 'mobile_number' },
-                { data: 'role.name' ,searchable: false},
-                // { data: null ,orderable: false ,searchable: false},
+                { data: 'role.name'},
+                { data: 'type' },
                 { data: 'id' },
             ],
             columnDefs: [
@@ -101,10 +101,12 @@ var KTCustomersList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
+                        <div class= "d-flex">
                             <a class="btn" href='/admin/officials/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/officials/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                             </button>
+                            </div>
                         `;
                     },
                 },
@@ -126,7 +128,6 @@ var KTCustomersList = function () {
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = () => {
-        console.log('dfds');
         const filterSearch = document.querySelector('[data-kt-customer-table-filter="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.search(e.target.value).draw();

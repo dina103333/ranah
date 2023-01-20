@@ -19,7 +19,9 @@ class Admin extends Authenticatable
     ];
 
     public function role(){
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class)->withDefault([
+            'name' => 'No Role'
+        ]);
     }
 
     public static function getEnumValues($table, $column) {

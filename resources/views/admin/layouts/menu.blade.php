@@ -83,8 +83,27 @@
     </a>
 </div>
 <div class="menu-item">
-    <a class="menu-link "
-         href="#">
+    <a class="menu-link  {{ Route::currentRouteName() == 'admin.products.index'? 'active' : '' }}"
+         href="{{route('admin.products.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">الموردين </span>
+    </a>
+</div>
+<div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.receipts.index'? 'active' : '' }}"
+         href="{{route('admin.receipts.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">فواتير الشراء </span>
+    </a>
+</div>
+
+<div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.stores.index'? 'active' : '' }}"
+         href="{{route('admin.stores.index')}}">
         <span class="menu-icon">
             <i class="bi bi-grid fs-3"></i>
         </span>

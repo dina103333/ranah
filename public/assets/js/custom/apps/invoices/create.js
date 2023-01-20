@@ -1,3 +1,4 @@
+
 "use strict";
 
 // Class definition
@@ -28,13 +29,13 @@ var KTAppInvoicesCreate = function () {
 			price.value = format.to(priceValue);
 			quantity.value = quantityValue;
 
-			item.querySelector('[data-kt-element="total"]').innerText = format.to(priceValue * quantityValue);			
+			item.querySelector('[data-kt-element="total"]').innerText = format.to(priceValue * quantityValue);
 
 			grandTotal += priceValue * quantityValue;
 		});
 
-		form.querySelector('[data-kt-element="sub-total"]').innerText = format.to(grandTotal);
-		form.querySelector('[data-kt-element="grand-total"]').innerText = format.to(grandTotal);
+		// form.querySelector('[data-kt-element="sub-total"]').innerText = format.to(grandTotal);
+		form.querySelector('[data-kt-element="grand-total"]').value = format.to(grandTotal);
 	}
 
 	var handleEmptyState = function() {
@@ -55,8 +56,10 @@ var KTAppInvoicesCreate = function () {
 
 			form.querySelector('[data-kt-element="items"] tbody').appendChild(item);
 
+            $(item.querySelectorAll('[data-value="new"]')).select2();
+
 			handleEmptyState();
-			updateTotal();			
+			updateTotal();
 		});
 
 		// Remove item
@@ -66,14 +69,14 @@ var KTAppInvoicesCreate = function () {
 			KTUtil.remove(this.closest('[data-kt-element="item"]'));
 
 			handleEmptyState();
-			updateTotal();			
-		});		
+			updateTotal();
+		});
 
 		// Handle price and quantity changes
 		KTUtil.on(form, '[data-kt-element="items"] [data-kt-element="quantity"], [data-kt-element="items"] [data-kt-element="price"]', 'change', function(e) {
 			e.preventDefault();
 
-			updateTotal();			
+			updateTotal();
 		});
 	}
 

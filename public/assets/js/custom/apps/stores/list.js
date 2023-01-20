@@ -19,6 +19,7 @@ $(document).on('click', '.delete', function (e){
                     _token : $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (res) {
+                    console.log(res)
                     if (result.value) {
                         Swal.fire({
                             icon: 'success',
@@ -34,115 +35,6 @@ $(document).on('click', '.delete', function (e){
         }
     })
 });
-function change_quantity(id){
-    Swal.fire({
-        title: 'هل تريد تغيير حاله كميه المنتج؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'نعم !',
-        cancelButtonText: 'الغاء',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/change-quantity',
-                type: 'get',
-                data: {
-                    _method : 'get',
-                    _token : $('meta[name="csrf-token"]').attr('content'),
-                    id:id
-                },
-                success: function (res) {
-                    if (result.value) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم تغيير حاله كميه المنتج',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        datatable.ajax.reload();
-                    }
-                }
-            });
-        }
-    })
-}
-function change_status(id){
-    Swal.fire({
-        title: 'هل تريد تغيير حاله المنتج؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'نعم !',
-        cancelButtonText: 'الغاء',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/change-status',
-                type: 'get',
-                data: {
-                    _method : 'get',
-                    _token : $('meta[name="csrf-token"]').attr('content'),
-                    id:id
-                },
-                success: function (res) {
-                    if (result.value) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم تغيير حاله المنتج',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        datatable.ajax.reload();
-                    }
-                }
-            });
-        }
-    })
-}
-function update_quantity(field) {
-    $(document).keyup(function(event) {
-        if(event.which == 13){
-            Swal.fire({
-                title: 'هل تريد تغيير الكميه ',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'نعم !',
-                cancelButtonText: 'الغاء',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    let id = field.id;
-                    let value =field.value;
-                    $.ajax({
-                        url: '/admin/update-product-quantity',
-                        type: 'get',
-                        data: {
-                            _method : 'get',
-                            _token : $('meta[name="csrf-token"]').attr('content'),
-                            id:id,
-                            value:value,
-                        },
-                        success: function (res) {
-                            if (result.value) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'تم التغيير',
-                                    showConfirmButton: false,
-                                    timer: 1500
-                                })
-                                datatable.ajax.reload();
-                            }
-                        }
-                    });
-                }
-            })
-        }
-});
-};
 "use strict";
 
 // Class definition
@@ -178,25 +70,23 @@ var KTRolesList = function () {
                 className: 'row-selected'
             },
             ajax: {
-                url: '/admin/get-products',
+                url: '/admin/get-stores',
             },
             columns: [
-                { data: 'id',className: 'text-center'},
-                { data: 'image' ,className: 'text-center'},
-                { data: 'name' ,className: 'text-center'},
-                { data: 'product_quantity' ,className: 'text-center'},
-                { data: 'wholesale_max_quantity',className: 'text-center' },
-                { data: 'id',className: 'text-center' },
-                { data: 'id',className: 'text-center' },
-                { data: 'status',className: 'text-center' },
-                { data: 'id' ,className: 'text-center' },
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'keeper.name' },
+                { data: 'finance_manager.name' },
+                { data: 'area.name' },
+                { data: 'id' },
+                { data: 'status' },
+                { data: 'id' },
             ],
             columnDefs: [
                 {
                     targets: 0,
                     orderable: false,
                     searchable: false,
-                    className: 'text-center',
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
@@ -205,73 +95,15 @@ var KTRolesList = function () {
                     }
                 },
                 {
-                    targets: 1,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data) {
-                        return `
-                                <div class=" align-items-center text-center">
-                                    <img  width="50%" height="50%" alt="Image placeholder" src="/storage/${data}">
-                                </div>
-                            `;
-                    }
-                },
-                {
-                    targets:4,
-                    orderable: true,
-                    searchable: true,
-                    className: 'text-center',
-                    render: function (data, type, full, meta ) {
-                         let content = `
-                                <div class=" align-items-center text-center form-group">
-                                    <input type="number" onkeyup="update_quantity(this);" id=${full.id} class="form-control quantity" name="max-quantity" value="${data}" style="width: 71%;">
-                                </div>
-                            `;
-                            return content
-                    }
-                },
-                {
                     targets: 5,
                     orderable: false,
                     searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, full, meta ) {
-                         let content = `
-                                <div class=" align-items-center text-center">
-                                    <button onclick="change_quantity(${data})" class="btn btn-light" title="تغيير حاله تحديد كميه المنتج">`
-                                        if(full.product_quantity == 'لا'){
-                                            content+=`<i class="fa fa-check-circle" style="color:#33d933;"></i>`
-                                        }
-                                        else{
-                                            content+=`<i class="fas fa-times" style="color:red;"></i>`
-                                        }
-                                    content+= `</button>
-                                </div>
-                            `;
-                            return content
-                    }
-                },
-                {
-                    targets: 6,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, full, meta ) {
-                        let content = `
+                    render: function (data,row,full) {
+                        return `
                                 <div class=" align-items-center text-center">
 
-                                    <button onclick="change_status(${data})" class="btn btn-light" title="تغيير حاله المنتج"> `
-                                    if(full.status == 'ايقاف'){
-                                        content+=`<i class="fa fa-check-circle" style="color:#33d933;"></i>`
-                                    }
-                                    else{
-                                        content+=`<i class="fas fa-times" style="color:red;"></i>`
-                                    }
-                                    content+= `</button>
                                 </div>
                             `;
-                            return content
                     }
                 },
                 {
@@ -279,15 +111,13 @@ var KTRolesList = function () {
                     data: null,
                     orderable: false,
                     searchable: false,
-                    className: 'text-center',
+                    className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <div class="d-flex">
-                                <a class="btn" href='/admin/products/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
-                                <button  data-url='/admin/products/${data}'
-                                    class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
-                                </button>
-                            </div>
+                            <a class="btn" href='/admin/stores/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <button  data-url='/admin/stores/${data}'
+                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                            </button>
                         `;
                     },
                 },
@@ -562,5 +392,6 @@ var KTRolesList = function () {
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
     KTRolesList.init();
+
 });
 

@@ -9,8 +9,5 @@
 
 
 <script src="/assets/plugins/custom/datatables/datatables.bundle.js"></script>
-{{-- <script src="/assets/js/custom/apps/customers/list/export.js"></script> --}}
-
-{{-- <script src="/assets/js/custom/apps/customers/add.js"></script> --}}
-{{-- <script src="/assets/js/custom/documentation/general/datatables/server-side.js"></script> --}}
+<script src="/assets/js/custom/apps/invoices/create.js"></script>
 

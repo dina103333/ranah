@@ -41,17 +41,21 @@
                         mobile_number:mobile_number
                     },
                     success: function (res) {
-                        console .log(res)
-                        var obj =  $.parseJSON(res);
-                        if(obj.type =='success'){
-                            var form = $('<form action="' + '/admin/otp-page' + '" method="post">' +
-                            `@csrf <input type="hidden" name="mobile" value="${mobile_number}" />` +
-                            '</form>');
-                            $('body').append(form);
-                            $(form).submit();
-                        }else{
+                        if(res =='failed'){
                             $('.error').css('display','flex')
+                        }else{
+                            var obj =  $.parseJSON(res);
+                            if(obj.type =='success'){
+                                var form = $('<form action="' + '/admin/otp-page' + '" method="post">' +
+                                `@csrf <input type="hidden" name="mobile" value="${mobile_number}" />` +
+                                '</form>');
+                                $('body').append(form);
+                                $(form).submit();
+                            }else{
+                                $('.error').css('display','flex')
+                            }
                         }
+
 
                     }
                 });

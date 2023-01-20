@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\StoreController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -71,4 +73,11 @@ Route::group([
         Route::get('/change-quantity',[ProductController::class,'changeQuantityStatus'])->name('change-quantity');
         Route::get('/change-status',[ProductController::class,'changeStatus'])->name('change-status');
         Route::get('/update-product-quantity',[ProductController::class,'updateProductQuantity'])->name('update-product-quantity');
+
+        Route::resource('/stores',StoreController::class);
+        Route::get('/get-stores',[StoreController::class,'getStores'])->name('get-stores');
+
+
+        Route::resource('/receipts',ReceiptController::class);
+        Route::get('/get-receipts',[ReceiptController::class,'getReceipts'])->name('get-receipts');
 });

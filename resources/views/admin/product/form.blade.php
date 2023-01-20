@@ -104,7 +104,7 @@
             </label>
             <div class="d-flex">
                 @foreach ($selling_type as $sell)
-                <input type="radio" name="sales" class="form-check-input" value="{{$sell}}" {{isset($product) ?( $sell == $product->selling_type ?'checked' : '') : ''}}>
+                <input type="radio" name="selling_type" class="form-check-input" value="{{$sell}}" {{isset($product) ?( $sell == $product->selling_type ?'checked' : '') : ''}}>
                 <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
                     <span>{{$sell}}</span>
                 </label>
@@ -112,8 +112,8 @@
             </div>
         </div>
     </div>
-    @if ($errors->has('sales'))
-        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('sales') }}</span>
+    @if ($errors->has('selling_type'))
+        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('selling_type') }}</span>
     @endif
 
     <div id="kt_modal_add_customer_billing_info" class="collapse show">
@@ -123,10 +123,10 @@
             </label>
             <div class="d-flex">
                 @foreach ($wating as $waite)
-                <input type="radio" name="wating" class="form-check-input" value="{{$waite}}" {{isset($product) ?( $waite == $product->wating ?'checked' : '') : ''}}>
-                <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
-                    <span>{{$waite}}</span>
-                </label>
+                    <input type="radio" name="wating" class="form-check-input" value="{{$waite}}" {{isset($product) ?( $waite == $product->wating ?'checked' : '') : ''}}>
+                    <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
+                        <span>{{$waite}}</span>
+                    </label>
                 @endforeach
             </div>
         </div>

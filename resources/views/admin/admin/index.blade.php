@@ -65,7 +65,7 @@
                                     <th class="min-w-125px">البريد الالكترونى</th>
                                     <th class="min-w-125px">رقم الهاتف</th>
                                     <th class="min-w-125px">الدور</th>
-                                    {{-- <th class="min-w-125px">مضاف بواسطه</th> --}}
+                                    <th class="min-w-125px">النوع</th>
                                     <th class="text-end min-w-70px">الاجراءات</th>
                                 </tr>
                             </thead>

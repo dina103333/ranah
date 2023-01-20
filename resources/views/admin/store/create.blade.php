@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title') الشركات @endsection
+@section('title') المخازن @endsection
 @section('list')
     <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
         <li class="breadcrumb-item text-muted">
@@ -8,7 +8,7 @@
         <li class="breadcrumb-item">
             <span class="bullet bg-gray-200 w-5px h-2px"></span>
         </li>
-        <li class="breadcrumb-item text-muted">اضافه شركه</li>
+        <li class="breadcrumb-item text-muted">اضافه مخزن</li>
     </ul>
 @endsection
 @section('content')
@@ -16,12 +16,12 @@
         <div id="kt_content_container" class="container-xxl">
             <div class="card">
                 <div class="card-body pt-0" style="direction: rtl">
-                    <form class="form" method="post" action="{{route('admin.companies.store')}}" enctype="multipart/form-data">
+                    <form class="form" method="post" action="{{route('admin.stores.store')}}" enctype="multipart/form-data">
                         @include('flash-message')
                         <div class="modal-header" id="kt_modal_add_role_header">
-                            <h2 class="fw-bolder">اضافه شركه</h2>
+                            <h2 class="fw-bolder">اضافه مخزن</h2>
                         </div>
-                        @include('admin.company.form')
+                        @include('admin.store.form')
                     </form>
                 </div>
             </div>
@@ -31,7 +31,23 @@
 
 
 @section('js')
-<script src="/assets/js/custom/apps/companies/list/list.js"></script>
+    <script src="/assets/js/custom/apps/stories/list/list.js"></script>
+    <script>
+        function CheckAll(className,e) {
+            var elements = document.getElementsByClassName(className)
+            var l = elements.length
+
+            if(e.checked){
+                for (var i = 0; i < l; i++){
+                    elements[i].checked = true;
+                }
+            }else{
+                for (var i = 0; i < l; i++){
+                    elements[i].checked = false;
+                }
+            }
+        }
+    </script>
 @endsection
 
 

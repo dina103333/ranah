@@ -26,7 +26,7 @@ class AdminController extends Controller
 
     public function getAdmins()
     {
-        $admins = Admin::with('role')->select('admins.id','admins.name', 'mobile_number', 'email','role_id');
+        $admins = Admin::with('role');
         return datatables($admins)->make(true);
     }
 
@@ -40,7 +40,8 @@ class AdminController extends Controller
     {
         $roles = Role::where('status','تفعيل')->select('id','name')->get();
         $status = Admin::getEnumValues('admins','status');
-        return view('admin.admin.create',compact('roles','status'));
+        $types = Admin::getEnumValues('admins','type');
+        return view('admin.admin.create',compact('roles','status','types'));
     }
 
     /**
@@ -58,6 +59,7 @@ class AdminController extends Controller
             'password' => bcrypt($request->password),
             'role_id' =>$request->role,
             'status' =>$request->status,
+            'type' =>$request->type,
         ]);
         $permissions = PermissionRole::where('role_id',$request->role)->pluck('permission_id');
         foreach($permissions as $permission){
@@ -80,7 +82,8 @@ class AdminController extends Controller
         $roles = Role::where('status','تفعيل')->get();
         $admin = Admin::find($admin);
         $status = Admin::getEnumValues('admins','status');
-        return view('admin.admin.edit',compact('roles','admin','status'));
+        $types = Admin::getEnumValues('admins','type');
+        return view('admin.admin.edit',compact('roles','admin','status','types'));
     }
 
     /**
@@ -100,6 +103,7 @@ class AdminController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $admin->password,
             'role_id' =>$request->role,
             'status' =>$request->status,
+            'type' =>$request->type,
         ]);
         PermissionUser::where('admin_id',$admin->id)->delete();
         $permissions = PermissionRole::where('role_id',$admin->role_id)->pluck('permission_id');
@@ -122,7 +126,6 @@ class AdminController extends Controller
     {
         PermissionUser::where('admin_id',$id)->delete();
         Admin::find($id)->delete();
-
     }
 
 }

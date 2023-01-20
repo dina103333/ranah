@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProductRequest;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Product;
@@ -55,25 +56,13 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         $file = $request->file('image')->store('public/files');
         $filepath=explode('/',$file);
-        Product::create([
-            'company_id'                => $request->company_id,
-            'category_id'               => $request->category_id,
-            'name'                      => $request->name,
-            'wholesale_type'            => $request->wholesale_type,
-            'item_type'                 => $request->item_type,
-            'wholesale_quantity_units'  => $request->wholesale_quantity_units,
-            'description'               => $request->description,
-            'wholesale_max_quantity'    => $request->wholesale_max_quantity,
-            'image'                     => $filepath[1].'/'.$filepath[2],
-            'selling_type'              => $request->sales,
-            'wating'                    => $request->wating,
-            'status'                    => $request->status,
-            'product_quantity'          => $request->product_quantity,
-        ]);
+        $product = Product::create($request->except(['image']));
+        $product->image = $filepath[1].'/'.$filepath[2];
+        $product->save();
         return redirect(route('admin.products.index'))->with('success','تم اضافه المنتج بنجاح');
     }
 
@@ -100,7 +89,7 @@ class ProductController extends Controller
     }
 
     public function updateProductQuantity(Request $request){
-        $product = Product::where('id',$request->id)->update(['wholesale_max_quantity'=>$request->value]);
+        Product::where('id',$request->id)->update(['wholesale_max_quantity'=>$request->value]);
     }
 
     /**
@@ -142,18 +131,15 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
-
-        $product->update($request->except(['image','selling_type']));
-        $product->selling_type = $request->sales;
+        $product->update($request->except(['image']));
         if($request->file('image')){
             $file = $request->file('image')->store('public/files');
             $filepath=explode('/',$file);
             $product->image = $filepath[1].'/'.$filepath[2];
-
+            $product->save();
         }
-        $product->save();
         return redirect(route('admin.products.index'))->with('success','تم تعديل المنتج بنجاح');
     }
 
@@ -165,6 +151,6 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
     }
 }
