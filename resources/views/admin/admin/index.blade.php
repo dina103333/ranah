@@ -46,7 +46,8 @@
                         <div class="d-flex justify-content-end align-items-center d-none" data-kt-customer-table-toolbar="selected">
                             <div class="fw-bolder me-5">
                             <span class="me-2" data-kt-customer-table-select="selected_count"></span>قيد الاختيار</div>
-                            <button type="button" class="btn btn-danger" data-kt-customer-table-select="delete_selected">حذف</button>
+{{--                            <button type="button" class="btn btn-danger delete-all" data-kt-customer-table-select="delete_selected">حذف</button>--}}
+                            <button type="button" class="btn btn-danger delete-all" data-kt-customer-table-select="delete_selected">حذف</button>
                         </div>
                     </div>
                 </div>
@@ -129,5 +130,42 @@
             $('.flash').fadeOut('fast');
         }, 3000);
     </script>
+
+{{--<script type="text/javascript">--}}
+{{--    $(document).ready(function () {--}}
+{{--        $('.delete-all').on('click', function(e) {--}}
+{{--            var idsArr = [];--}}
+{{--            $(".checkbox:checked").each(function() {--}}
+{{--                idsArr.push($(this).attr('data-id'));--}}
+{{--            });--}}
+{{--            if(idsArr.length <=0)--}}
+{{--            {--}}
+{{--                alert("Please select atleast one record to delete.");--}}
+{{--            }  else {--}}
+{{--                if(confirm("Are you sure, you want to delete the selected categories?")){--}}
+{{--                    var strIds = idsArr.join(",");--}}
+{{--                    $.ajax({--}}
+{{--                        url: "{{ route('admin.delete_multiple') }}",--}}
+{{--                        type: 'DELETE',--}}
+{{--                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},--}}
+{{--                        data: 'ids='+strIds,--}}
+{{--                        success: function (data) {--}}
+{{--                            console.log(data)--}}
+{{--                        },--}}
+{{--                        error: function (data) {--}}
+{{--                            console.log(data)--}}
+{{--                        }--}}
+{{--                    });--}}
+{{--                }--}}
+{{--            }--}}
+{{--        });--}}
+{{--        $('[data-toggle=confirmation]').confirmation({--}}
+{{--            rootSelector: '[data-toggle=confirmation]',--}}
+{{--            onConfirm: function (event, element) {--}}
+{{--                element.closest('form').submit();--}}
+{{--            }--}}
+{{--        });--}}
+{{--    });--}}
+{{--</script>--}}
 @endsection
 

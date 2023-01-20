@@ -58,7 +58,7 @@ var KTCustomersList = function () {
 
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
-            // responsive: true,
+            responsive: true,
             searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -70,16 +70,14 @@ var KTCustomersList = function () {
                 className: 'row-selected'
             },
             ajax: {
-                url: '/admin/admins',
+                url: '/admin/get-sellers',
             },
             columns: [
-                { data: 'id' },
-                { data: 'name' },
-                { data: 'email' },
-                { data: 'mobile_number' },
-                { data: 'role.name'},
-                { data: 'type' },
-                { data: 'id' },
+                {data: 'id'},
+                {data: 'name'},
+                {data: 'mobile_number'},
+                {data: 'address'},
+                {data: 'id'},
             ],
             columnDefs: [
                 {
@@ -101,12 +99,10 @@ var KTCustomersList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                        <div class= "d-flex">
-                            <a class="btn" href='/admin/officials/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
-                            <button  data-url='/admin/officials/${data}'
+                            <a class="btn" href='/admin/sellers/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <button  data-url='/admin/sellers/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                             </button>
-                            </div>
                         `;
                     },
                 },
@@ -128,6 +124,7 @@ var KTCustomersList = function () {
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = () => {
+        console.log('dfds');
         const filterSearch = document.querySelector('[data-kt-customer-table-filter="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.search(e.target.value).draw();
@@ -285,7 +282,7 @@ var KTCustomersList = function () {
             }).then(function (result) {
                 if (result.value) {
                     $.ajax({
-                        url: "/admin/multiAdminDelete",
+                        url: "/admin/multiSellersDelete",
                         type: 'DELETE',
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: 'ids=' + strIds,
