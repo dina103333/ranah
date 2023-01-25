@@ -17,7 +17,7 @@
         <div id="kt_content_container" class="container-xxl">
             <div class="card">
                 <div class="card-body pt-0" style="direction: rtl">
-                    <form class="form" method="post" action="{{route('admin.categories.update',$category)}}" id="kt_invoice_form" enctype="multipart/form-data">
+                    <form class="form" method="post" action="{{route('admin.receipts.update',$receipt->id)}}" id="kt_invoice_form" enctype="multipart/form-data">
                         @method('PUT')
                         @include('flash-message')
                         <div class="modal-header" id="kt_modal_add_role_header">

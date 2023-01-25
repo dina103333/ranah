@@ -114,6 +114,7 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
+                            <a class="btn" href='/admin/get-store-products/${data}' class=" px-3"><i class="fab fa-product-hunt"></i></a>
                             <a class="btn" href='/admin/stores/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/stores/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
@@ -126,7 +127,6 @@ var KTRolesList = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             }
-
         });
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw

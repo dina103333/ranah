@@ -139,6 +139,7 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
+        Laravel\Sanctum\SanctumServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
         Illuminate\Bus\BusServiceProvider::class,
@@ -165,7 +166,7 @@ return [
         /*
          * Package Service Providers...
          */
-        
+
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
 
         /*
@@ -233,6 +234,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+        'Sanctum' => Laravel\Sanctum\Sanctum::class,
     ],
 
 ];

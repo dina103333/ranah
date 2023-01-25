@@ -26,6 +26,13 @@ class Store extends Model
         return $this->belongsTo(Area::class);
     }
 
+    public function products(){
+        return $this->belongsToMany(Product::class,'stores_products','store_id','product_id')
+        ->withPivot('sell_wholesale_price','sell_item_price','wholesale_quantity','unit_quantity','lower_limit',
+                    'max_limit','reorder_limit','buy_price','unit_gain_ratio','wholesale_gain_ratio','wholesale_gain_value','unit_gain_value',
+                     'loss','production_date','expiry_date');
+    }
+
 
 
     public static function getEnumValues($table, $column) {

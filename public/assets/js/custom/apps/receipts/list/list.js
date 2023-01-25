@@ -35,6 +35,40 @@ $(document).on('click', '.delete', function (e){
         }
     })
 });
+$(document).on('click', '.approve', function (e){
+    Swal.fire({
+            title: 'هل انت متأكد؟',
+            text: "لن تتمكن من التراجع عن هذا!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'نعم !',
+            cancelButtonText: 'الغاء',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: $(this).data('url'),
+                type: 'GET',
+                data: {
+                    _method : 'GET',
+                    _token : $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (res) {
+                    if (result.value) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'تم التسليم',
+                            showConfirmButton: false,
+                            timer: 1500
+                        })
+                        datatable.ajax.reload();
+                    }
+                }
+            });
+        }
+    })
+});
 "use strict";
 
 // Class definition
@@ -44,6 +78,7 @@ var KTRolesList = function () {
     var filterMonth;
     var filterPayment;
     var table
+    let content = ``;
 
     // Private functions
     var initCustomerList = function () {
@@ -58,7 +93,7 @@ var KTRolesList = function () {
 
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
-            responsive: true,
+            // responsive: true,
             searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -79,7 +114,7 @@ var KTRolesList = function () {
                 { data: 'total' },
                 { data: 'keeper.name' },
                 { data: 'created_at' },
-                { data: 'status' },
+                { data: 'is_received' },
                 { data: 'id' },
             ],
             columnDefs: [
@@ -95,18 +130,49 @@ var KTRolesList = function () {
                     }
                 },
                 {
+                    targets: 6,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data) {
+                        let content
+                        if(data == false){
+                            content = ` <span>لم يتم الاستلام</span>`
+                        }else{
+                            content = ` <span>تم الاستلام من جهه امين المخزن</span>`
+                        }
+                        return content;
+                    }
+                },
+                {
                     targets: -1,
                     data: null,
                     orderable: false,
                     searchable: false,
                     className: 'text-end',
                     render: function (data, type, row) {
-                        return `
-                            <a class="btn" href='/admin/companies/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
-                            <button  data-url='/admin/companies/${data}'
-                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
-                            </button>
-                        `;
+                        if(row.is_received == false){
+                            content= `
+                                <div class="d-flex">
+                                    <a class="btn" href='/admin/receipts/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                                    <button  data-url='/admin/receipts/${data}'
+                                        class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                                    </button>
+                                </div>
+                                <div class="d-flex">
+                                    <a class="btn" href='/admin/receipts/${data}/edit' class=" px-3"><i class="fas fa-eye"></i></a>
+                                    <button  data-url='/admin/receive-receipts/${data}'
+                                        class="btn px-3 approve"><i class="fas fa-check" style="color:green"></i>
+                                    </button>
+                                </div>
+                            `
+                        }else{
+                            content= `
+                            <div class="d-flex">
+                                <a class="btn" href='/admin/receipts/${data}' class=" px-3"><i class="fas fa-eye"></i></a>
+                            </div>
+                            `
+                        }
+                        return content
                     },
                 },
             ],

@@ -9,6 +9,7 @@ use App\Models\Company;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 
 class StoreController extends Controller
@@ -40,14 +41,9 @@ class StoreController extends Controller
         $procurement_officers = Admin::where('type','مسؤول المشتريات')->where('store_id',null)->get();
         $finance_officers = Admin::where('type','مسؤول الماليه')->where('store_id',null)->get();
         $salesmen = Admin::where('type','بائع')->where('store_id',null)->get();
-        $companies = Company::where('status','تفعيل')
-                            ->with(['products'=>function($q){
-                                $q->where('status','تفعيل')->select('id','name','company_id');
-                            }])->select('id','name')->get();
-        // return $products;
         $areas = Area::where('status','تفعيل')->get();
         $status = Store::getEnumValues('stores','status');
-        return view('admin.store.create',compact('storekeepers','procurement_officers','finance_officers','salesmen','companies','areas','status'));
+        return view('admin.store.create',compact('storekeepers','procurement_officers','finance_officers','salesmen','areas','status'));
     }
 
     /**
@@ -70,19 +66,39 @@ class StoreController extends Controller
         ]);
         Admin::whereIn('id',$request->finance_officers)->update(['store_id'=>$store->id]);
         Admin::whereIn('id',$request->storekeepers)->update(['store_id'=>$store->id]);
-        foreach($request->products as $key=>$product){
-            StoreProduct::create([
-                'store_id'              => $store->id,
-                'product_id'            => $product,
-                'sell_wholesale_price'  => $request->sell_wholesale_price[$key],
-                'sell_item_price'       => $request->sell_item_price[$key],
-                'max_limit'             => $request->max_limit[$key],
-                'lower_limit'           => $request->lower_limit[$key],
-                'reorder_limit'         => $request->reorder_limit[$key],
-            ]);
-        }
-
         return redirect()->route('admin.stores.index')->with('success','تم اضافه المخزن بنجاح');
+    }
+
+    public function getStoreProducts($store_id){
+        $products = Product::with(['stores'=>function($q) use($store_id){
+                        $q->where('stores_products.store_id',$store_id)->select('stores.id')->first()
+                        ;
+                    }])->with('company:id,name','category:id,name')
+                    ->select('products.name','products.id','wholesale_type','item_type','company_id','category_id')->paginate(10);
+                    // return $products;
+        return view('admin.store.product',compact('products','store_id'));
+    }
+
+    public function getStoreProductsTable($store_id){
+        $products = Product::with(['stores'=>function($q) use($store_id){
+            $q->where('stores_products.store_id',$store_id)->select('stores.id')->first()
+            ;
+        }])->with('company:id,name','category:id,name')
+        ->select('products.name','products.id','wholesale_type','item_type','company_id','category_id');
+        return datatables($products)->make(true);
+    }
+
+    public function editStoreProduct($product_id,$store_id){
+        $product = Product::with(['stores'=>function($q) use($store_id){
+            $q->where('stores_products.store_id',$store_id)->select('stores.id')->first();
+        }])->where('products.id',$product_id)
+        ->select('products.name','products.id','wholesale_type','item_type','selling_type')->first();
+        return $product;
+        return View('admin.store.product_form',compact($product));
+    }
+
+    public function updateStoreProduct($product_id){
+
     }
 
     /**
@@ -104,7 +120,27 @@ class StoreController extends Controller
      */
     public function edit(Store $store)
     {
-        //
+        $keepers = Admin::where('type','امين مخزن')->where('store_id',$store->id)->pluck('id')->toArray();
+
+        $storekeepers = Admin::where('type','امين مخزن')->where(function($q) use ($store){
+            $q->where('store_id',$store->id)->orWhere('store_id',null);
+        })->get();
+
+        $store_finance_officers = Admin::where('type','مسؤول الماليه')->where('store_id',$store->id)->pluck('id')->toArray();
+
+        $finance_officers = Admin::where('type','مسؤول الماليه')->where(function($q) use ($store){
+            $q->where('store_id',$store->id)->orWhere('store_id',null);
+        })->get();
+
+        $stor_salesmen = Admin::where('type','بائع')->where('store_id',$store->id)->pluck('id')->toArray();
+
+        $salesmen = Admin::where('type','بائع')->where(function($q) use ($store){
+            $q->where('store_id',$store->id)->orWhere('store_id',null);
+        })->get();
+
+        $areas = Area::where('status','تفعيل')->get();
+        $status = Store::getEnumValues('stores','status');
+        return view('admin.store.edit',compact('keepers','storekeepers','finance_officers','store_finance_officers','salesmen','stor_salesmen','areas','status','store'));
     }
 
     /**
@@ -116,7 +152,23 @@ class StoreController extends Controller
      */
     public function update(Request $request, Store $store)
     {
-        //
+        $store->update([
+            'name' => $request->name,
+            'area_id' => $request->area_id,
+            'store_keeper_id' => $request->storekeeper_id,
+            'store_finance_manager_id' => $request->finance_officer_id,
+            'address' => $request->address,
+            'longitude' => $request->longitude,
+            'latitude' => $request->latitude,
+            'status' => $request->status,
+        ]);
+
+        Admin::where('store_id',$store->id)->update(['store_id'=>null]);
+
+        Admin::whereIn('id',$request->finance_officers)->update(['store_id'=>$store->id]);
+        Admin::whereIn('id',$request->storekeepers)->update(['store_id'=>$store->id]);
+        Admin::whereIn('id',$request->sales)->update(['store_id'=>$store->id]);
+        return redirect()->route('admin.stores.index')->with('success','تم تعديل المخزن بنجاح');
     }
 
     /**

@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\ReceiptController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SellerController;
+use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Admin\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -86,10 +88,15 @@ Route::group([
 
     Route::resource('/stores',StoreController::class);
     Route::get('/get-stores',[StoreController::class,'getStores'])->name('get-stores');
+    Route::get('/get-store-products/{id}',[StoreController::class,'getStoreProducts'])->name('get-store-products');
+    Route::get('/get-store-products-table/{id}',[StoreController::class,'getStoreProductsTable'])->name('get-store-products-table');
+    Route::get('/edit-store-product/{id}/{store_id}',[StoreController::class,'editStoreProduct'])->name('edit-store-product');
+    Route::post('/update-store-product/{id}',[StoreController::class,'updateStoreProduct'])->name('update-store-product');
 
 
     Route::resource('/receipts',ReceiptController::class);
     Route::get('/get-receipts',[ReceiptController::class,'getReceipts'])->name('get-receipts');
+    Route::get('/receive-receipts/{id}',[ReceiptController::class,'receiveReceipt'])->name('receive-receipts');
 
     Route::post('/drivers/export/', [DriverController::class, 'export'])->name('drivers.export');
     Route::resource('/drivers', DriverController::class);
@@ -100,4 +107,13 @@ Route::group([
     Route::resource('/sellers', SellerController::class);
     Route::delete('/multiSellersDelete', [SellerController::class, 'multiSellersDelete']);
     Route::get('/get-sellers', [SellerController::class, 'getSellers'])->name('get-sellers');
+
+
+    Route::resource('/suppliers', SupplierController::class);
+    Route::post('/suppliers/export/', [SupplierController::class, 'export'])->name('suppliers.export');
+    Route::delete('/multiSellersDelete', [SupplierController::class, 'multiSuppliersDelete']);
+    Route::get('/get-suppliers', [SupplierController::class, 'getSellers'])->name('get-suppliers');
+
+    Route::resource('/shops', ShopController::class);
+
 });

@@ -57,7 +57,7 @@ var KTAppInvoicesCreate = function () {
 			form.querySelector('[data-kt-element="items"] tbody').appendChild(item);
 
             $(item.querySelectorAll('[data-value="new"]')).select2();
-
+            $(".kt_datepicker_1").flatpickr();
 			handleEmptyState();
 			updateTotal();
 		});

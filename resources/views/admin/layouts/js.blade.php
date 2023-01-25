@@ -10,4 +10,5 @@
 
 <script src="/assets/plugins/custom/datatables/datatables.bundle.js"></script>
 <script src="/assets/js/custom/apps/invoices/create.js"></script>
+<script src="/assets/js/jQuery.print.min.js"></script>
 

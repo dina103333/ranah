@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\SupplierExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierController extends Controller
 {
@@ -15,7 +18,14 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers = Supplier::latest()->paginate('10');
+        return view('admin.supplier.index',compact('suppliers'));
+    }
+
+    public function getSellers()
+    {
+        $suppliers = Supplier::latest()->select('id','name');
+        return datatables($suppliers)->make(true);
     }
 
     /**
@@ -25,7 +35,8 @@ class SupplierController extends Controller
      */
     public function create()
     {
-        //
+        $status = Supplier::getEnumValues('suppliers','status');
+        return view('admin.supplier.create',compact('status'));
     }
 
     /**
@@ -34,53 +45,75 @@ class SupplierController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SupplierRequest $request)
     {
-        //
+        Supplier::create([
+            'name' =>$request->name,
+        ]);
+
+        return redirect()->route('admin.suppliers.index')->with('success','تم اضافه بائع بنجاح');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Supplier  $supplier
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function show(Supplier $supplier)
+    public function show(Supplier $seller)
     {
-        //
+       //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Supplier  $supplier
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
     public function edit(Supplier $supplier)
     {
-        //
+        $status = Supplier::getEnumValues('suppliers','status');
+        return view('admin.supplier.edit',compact('supplier','status'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Supplier  $supplier
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Supplier $supplier)
+    public function update(SupplierRequest $request, Supplier $supplier)
     {
-        //
+        $supplier->update([
+            'name' =>$request->name,
+        ]);
+
+        return redirect(route('admin.suppliers.index'))->with('success','تم تعديل المورد بنجاح');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Supplier  $supplier
+     * @param  \App\Models\Seller $seller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Supplier $supplier)
     {
-        //
+        $supplier->delete();
+    }
+
+    public function multiSuppliersDelete(Request $request)
+    {
+        $ids = $request->ids;
+        Supplier::whereIn('id',explode(",",$ids))->delete();
+
+        return response()->json(['status' => true, 'message' => "Records deleted successfully."]);
+    }
+
+    public function export()
+    {
+        return Excel::download(new SupplierExport, 'sellers.xlsx');
     }
 }

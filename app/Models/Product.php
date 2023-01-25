@@ -17,6 +17,13 @@ class Product extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function stores(){
+        return $this->belongsToMany(Store::class,'stores_products','product_id','store_id')
+        ->withPivot('sell_wholesale_price','sell_item_price','wholesale_quantity','unit_quantity','lower_limit',
+                    'max_limit','reorder_limit','buy_price','unit_gain_ratio','wholesale_gain_ratio','wholesale_gain_value','unit_gain_value',
+                     'loss','production_date','expiry_date');
+    }
+
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;
         preg_match('/^enum\((.*)\)$/', $type, $matches);

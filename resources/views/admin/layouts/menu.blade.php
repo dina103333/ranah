@@ -83,8 +83,8 @@
     </a>
 </div>
 <div class="menu-item">
-    <a class="menu-link  {{ Route::currentRouteName() == 'admin.products.index'? 'active' : '' }}"
-         href="{{route('admin.products.index')}}">
+    <a class="menu-link  {{ Route::currentRouteName() == 'admin.suppliers.index'? 'active' : '' }}"
+         href="{{route('admin.suppliers.index')}}">
         <span class="menu-icon">
             <i class="bi bi-grid fs-3"></i>
         </span>

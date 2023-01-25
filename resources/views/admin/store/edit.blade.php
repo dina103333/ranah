@@ -8,7 +8,7 @@
         <li class="breadcrumb-item">
             <span class="bullet bg-gray-200 w-5px h-2px"></span>
         </li>
-        <li class="breadcrumb-item text-muted">تعديل مسؤول</li>
+        <li class="breadcrumb-item text-muted">تعديل المخزن</li>
     </ul>
 @endsection
 @section('content')
@@ -17,13 +17,13 @@
         <div id="kt_content_container" class="container-xxl">
             <div class="card">
                 <div class="card-body pt-0" style="direction: rtl">
-                    <form class="form" method="post" action="{{route('admin.companies.update',$company)}}" enctype="multipart/form-data">
+                    <form class="form" method="post" action="{{route('admin.stores.update',$store)}}" enctype="multipart/form-data">
                         @method('PUT')
                         @include('flash-message')
                         <div class="modal-header" id="kt_modal_add_role_header">
-                            <h2 class="fw-bolder">تعديل مستخدم</h2>
+                            <h2 class="fw-bolder">تعديل المخزن</h2>
                         </div>
-                        @include('admin.company.form')
+                        @include('admin.store.form')
                     </form>
                 </div>
             </div>

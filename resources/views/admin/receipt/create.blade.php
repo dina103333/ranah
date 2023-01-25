@@ -34,8 +34,7 @@
 <script src="/assets/js/custom/apps/categories/list/list.js"></script>
 <script>
     $(document).ready(function() {
-        $("#kt_datepicker_1").flatpickr();
-        $("#kt_datepicker_2").flatpickr();
+        $(".kt_datepicker_1").flatpickr();
 });
 </script>
 @endsection
