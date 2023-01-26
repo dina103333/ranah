@@ -22,6 +22,14 @@ trait ApiResponse
             'data' => $data
         ], $code);
     }
+    public function successSingle(string $message,$data, int $code = 200): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => $data
+        ], $code);
+    }
 
     /**
      * Return error response with message.

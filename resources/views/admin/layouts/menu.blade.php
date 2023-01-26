@@ -129,6 +129,24 @@
     </a>
 </div>
 <div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.areas.index'? 'active' : '' }} "
+         href="{{route('admin.areas.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">المناطق </span>
+    </a>
+</div>
+<div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.shops.index'? 'active' : '' }} "
+         href="{{route('admin.shops.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">انواع المحلات </span>
+    </a>
+</div>
+<div class="menu-item">
     <a class="menu-link "
          href="#">
         <span class="menu-icon">

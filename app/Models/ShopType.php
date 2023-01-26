@@ -6,14 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class Area extends Model
+class ShopType extends Model
 {
     use HasFactory;
+    protected $table = 'shope_types';
     protected $guarded=[];
-    protected $hidden = [
-        'created_at',
-        'updated_at',
-    ];
+
 
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;

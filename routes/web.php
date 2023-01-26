@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AreaController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\Auth\ForgetpasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
@@ -91,7 +92,7 @@ Route::group([
     Route::get('/get-store-products/{id}',[StoreController::class,'getStoreProducts'])->name('get-store-products');
     Route::get('/get-store-products-table/{id}',[StoreController::class,'getStoreProductsTable'])->name('get-store-products-table');
     Route::get('/edit-store-product/{id}/{store_id}',[StoreController::class,'editStoreProduct'])->name('edit-store-product');
-    Route::post('/update-store-product/{id}',[StoreController::class,'updateStoreProduct'])->name('update-store-product');
+    Route::post('/update-store-product',[StoreController::class,'updateStoreProduct'])->name('update-store-product');
 
 
     Route::resource('/receipts',ReceiptController::class);
@@ -115,5 +116,15 @@ Route::group([
     Route::get('/get-suppliers', [SupplierController::class, 'getSellers'])->name('get-suppliers');
 
     Route::resource('/shops', ShopController::class);
+
+
+    Route::resource('/areas', AreaController::class);
+    Route::get('/get-areas', [AreaController::class, 'getAreas'])->name('get-areas');
+    Route::delete('/multiAreasDelete', [AreaController::class, 'multiAreasDelete']);
+
+
+    Route::resource('/shops', ShopController::class);
+    Route::get('/get-shops', [ShopController::class, 'getShops'])->name('get-shops');
+    Route::delete('/multiShopsDelete', [ShopController::class, 'multiShopsDelete']);
 
 });

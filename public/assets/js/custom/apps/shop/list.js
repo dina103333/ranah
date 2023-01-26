@@ -1,24 +1,22 @@
 var datatable;
-var store_id = $('.store_id').val();
-console.log(store_id)
-$(document).on('click', '.delete', function (e){
+$(document).on('click', '.delete', function (e) {
     Swal.fire({
-            title: 'هل انت متأكد؟',
-            text: "لن تتمكن من التراجع عن هذا!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'نعم احذفها!',
-            cancelButtonText: 'الغاء',
+        title: 'هل انت متأكد؟',
+        text: "لن تتمكن من التراجع عن هذا!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'نعم احذفها!',
+        cancelButtonText: 'الغاء',
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
                 url: $(this).data('url'),
                 type: 'POST',
                 data: {
-                    _method : 'DELETE',
-                    _token : $('meta[name="csrf-token"]').attr('content')
+                    _method: 'DELETE',
+                    _token: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (res) {
                     console.log(res)
@@ -40,7 +38,7 @@ $(document).on('click', '.delete', function (e){
 "use strict";
 
 // Class definition
-var KTRolesList = function () {
+var KTCustomersList = function () {
     // Define shared variables
 
     var filterMonth;
@@ -72,25 +70,26 @@ var KTRolesList = function () {
                 className: 'row-selected'
             },
             ajax: {
-                url: '/admin/get-store-products-table/'+store_id,
+                url: '/admin/get-shops',
             },
             columns: [
-                { data: 'name' },
-                { data: 'company_name' },
-                { data: 'category_name' },
-                { data: 'wholesale_quantity'},
-                { data: 'unit_quantity'},
-                { data: 'wholesale_type' },
-                { data: 'item_type' },
-                { data: 'reorder_limit'},
-                { data: 'buy_price' },
-                { data: 'sell_item_price'},
-                { data: 'sell_wholesale_price'},
-                { data: 'production_date'},
-                { data: 'expiry_date'},
-                { data: 'id' },
+                {data: 'id'},
+                {data: 'name'},
+                {data: 'status'},
+                {data: 'id'},
             ],
             columnDefs: [
+                {
+                    targets: 0,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data) {
+                        return `
+                            <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                <input class="form-check-input checkbox" type="checkbox" data-id="${data}" value="${data}" />
+                            </div>`;
+                    }
+                },
                 {
                     targets: -1,
                     data: null,
@@ -99,7 +98,10 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/edit-store-product/${data}/${store_id}' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class="btn" href='/admin/shops/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <button  data-url='/admin/shops/${data}'
+                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                            </button>
                         `;
                     },
                 },
@@ -108,18 +110,21 @@ var KTRolesList = function () {
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             }
+
         });
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
         datatable.on('draw', function () {
             initToggleToolbar();
+            handleDeleteRows();
+            toggleToolbars();
         });
     }
 
     // Search Datatable --- official docs reference: https://datatables.net/reference/api/search()
     var handleSearchDatatable = () => {
-        console.log('sdffd');
-        const filterSearch = document.querySelector('[data-kt-role-table-filter="search"]');
+        console.log('dfds');
+        const filterSearch = document.querySelector('[data-kt-customer-table-filter="search"]');
         filterSearch.addEventListener('keyup', function (e) {
             datatable.search(e.target.value).draw();
         });
@@ -128,9 +133,9 @@ var KTRolesList = function () {
     // Filter Datatable
     var handleFilterDatatable = () => {
         // Select filter options
-        filterMonth = $('[data-kt-role-table-filter="month"]');
-        filterPayment = document.querySelectorAll('[data-kt-role-table-filter="payment_type"] [name="payment_type"]');
-        const filterButton = document.querySelector('[data-kt-role-table-filter="filter"]');
+        filterMonth = $('[data-kt-customer-table-filter="month"]');
+        filterPayment = document.querySelectorAll('[data-kt-customer-table-filter="payment_type"] [name="payment_type"]');
+        const filterButton = document.querySelector('[data-kt-customer-table-filter="filter"]');
 
         // Filter datatable on submit
         filterButton.addEventListener('click', function () {
@@ -161,7 +166,7 @@ var KTRolesList = function () {
     // Delete customer
     var handleDeleteRows = () => {
         // Select all delete buttons
-        const deleteButtons = table.querySelectorAll('[data-kt-role-table-filter="delete_row"]');
+        const deleteButtons = table.querySelectorAll('[data-kt-customer-table-filter="delete_row"]');
 
         deleteButtons.forEach(d => {
             // Delete button on click
@@ -219,7 +224,7 @@ var KTRolesList = function () {
     // Reset Filter
     var handleResetForm = () => {
         // Select reset button
-        const resetButton = document.querySelector('[data-kt-role-table-filter="reset"]');
+        const resetButton = document.querySelector('[data-kt-customer-table-filter="reset"]');
 
         // Reset datatable
         resetButton.addEventListener('click', function () {
@@ -239,9 +244,10 @@ var KTRolesList = function () {
         // Toggle selected action toolbar
         // Select all checkboxes
         const checkboxes = table.querySelectorAll('[type="checkbox"]');
+        console.log(checkboxes);
 
         // Select elements
-        const deleteSelected = document.querySelector('[data-kt-role-table-select="delete_selected"]');
+        const deleteSelected = document.querySelector('[data-kt-customer-table-select="delete_selected"]');
 
         // Toggle delete selected toolbar
         checkboxes.forEach(c => {
@@ -253,21 +259,105 @@ var KTRolesList = function () {
             });
         });
 
+        // Deleted selected rows
+        $('.delete-all').on('click', function (e) {
+            var idsArr = [];
+            $(".checkbox:checked").each(function () {
+                idsArr.push($(this).attr('data-id'));
+            });
+            var strIds = idsArr.join(",");
+            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
+            Swal.fire({
+                text: "Are you sure you want to delete selected customers?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    $.ajax({
+                        url: "/admin/multiShopsDelete",
+                        type: 'DELETE',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: 'ids=' + strIds,
+                        success: function (data) {
+                            console.log(data)
+                            const parent = e.target.closest('tr');
+                            datatable.row($(parent)).remove().draw();
+                        },
+                        error: function (data) {
+                            console.log(data)
+                        }
+                    });
+
+                    // });
+                } else if (result.dismiss === 'cancel') {
+                    Swal.fire({
+                        text: "Selected customers was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
+        });
     }
 
+    // Toggle toolbars
+    const toggleToolbars = () => {
+        // Define variables
+        const toolbarBase = document.querySelector('[data-kt-customer-table-toolbar="base"]');
+        const toolbarSelected = document.querySelector('[data-kt-customer-table-toolbar="selected"]');
+        const selectedCount = document.querySelector('[data-kt-customer-table-select="selected_count"]');
+
+        // Select refreshed checkbox DOM elements
+        const allCheckboxes = table.querySelectorAll('tbody [type="checkbox"]');
+
+        // Detect checkboxes state & count
+        let checkedState = false;
+        let count = 0;
+
+        // Count checked boxes
+        allCheckboxes.forEach(c => {
+            if (c.checked) {
+                checkedState = true;
+                count++;
+            }
+        });
+
+        // Toggle toolbars
+        if (checkedState) {
+            selectedCount.innerHTML = count;
+            toolbarBase.classList.add('d-none');
+            toolbarSelected.classList.remove('d-none');
+        } else {
+            toolbarBase.classList.remove('d-none');
+            toolbarSelected.classList.add('d-none');
+        }
+    }
 
     // Public methods
     return {
         init: function () {
-            table = document.querySelector('#kt_roles_table');
+            table = document.querySelector('#kt_customers_table');
 
             if (!table) {
                 return;
             }
 
             initCustomerList();
+            initToggleToolbar();
             handleSearchDatatable();
             handleFilterDatatable();
+            handleDeleteRows();
             handleResetForm();
         }
     }
@@ -275,7 +365,7 @@ var KTRolesList = function () {
 
 // On document ready
 KTUtil.onDOMContentLoaded(function () {
-    KTRolesList.init();
+    KTCustomersList.init();
 
 });
 

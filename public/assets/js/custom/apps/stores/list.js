@@ -101,7 +101,9 @@ var KTRolesList = function () {
                     render: function (data,row,full) {
                         return `
                                 <div class=" align-items-center text-center">
-
+                                    <a href="https://maps.google.com?q=${full.latitude},${full.longitude}}" TARGET="_blank">
+                                        ${full.address}
+                                    </a>
                                 </div>
                             `;
                     }

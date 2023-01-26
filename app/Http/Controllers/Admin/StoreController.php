@@ -3,14 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreProductRequest;
+use App\Http\Requests\Admin\StoreRequest;
+use App\Http\Resources\Admin\StoreResource;
 use App\Models\Admin;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\Receipt;
+use App\Models\ReceiptProduct;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Cast\Double;
+use DataTables;
 
 class StoreController extends Controller
 {
@@ -52,7 +59,7 @@ class StoreController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
         $store = Store::create([
             'name' => $request->name,
@@ -70,35 +77,57 @@ class StoreController extends Controller
     }
 
     public function getStoreProducts($store_id){
-        $products = Product::with(['stores'=>function($q) use($store_id){
-                        $q->where('stores_products.store_id',$store_id)->select('stores.id')->first()
-                        ;
-                    }])->with('company:id,name','category:id,name')
+        $products = Product::whereHas('stores',function($q) use($store_id){
+                        $q->where('stores_products.store_id',$store_id)->select('stores.id');
+                    })
+                    ->with(['stores'=>function($q) use($store_id){
+                            $q->where('stores_products.store_id',$store_id)->select('stores.id');
+                        },'company:id,name','category:id,name'])
                     ->select('products.name','products.id','wholesale_type','item_type','company_id','category_id')->paginate(10);
-                    // return $products;
+                  $products = StoreResource::collection($products);
         return view('admin.store.product',compact('products','store_id'));
     }
 
     public function getStoreProductsTable($store_id){
-        $products = Product::with(['stores'=>function($q) use($store_id){
-            $q->where('stores_products.store_id',$store_id)->select('stores.id')->first()
-            ;
-        }])->with('company:id,name','category:id,name')
-        ->select('products.name','products.id','wholesale_type','item_type','company_id','category_id');
-        return datatables($products)->make(true);
+        $products = Product::whereHas('stores',function($q) use($store_id){
+                        $q->where('stores_products.store_id',$store_id)->select('stores.id');
+                    })
+                    ->with(['stores'=>function($q) use($store_id){
+                            $q->where('stores_products.store_id',$store_id)->select('stores.id');
+                        },'company:id,name','category:id,name'])
+                    ->select('products.name','products.id','wholesale_type','item_type','company_id','category_id')->get();
+        $products = StoreResource::collection($products);
+        return DataTables::of($products)->toJson();
+
     }
 
     public function editStoreProduct($product_id,$store_id){
         $product = Product::with(['stores'=>function($q) use($store_id){
             $q->where('stores_products.store_id',$store_id)->select('stores.id')->first();
         }])->where('products.id',$product_id)
-        ->select('products.name','products.id','wholesale_type','item_type','selling_type')->first();
-        return $product;
-        return View('admin.store.product_form',compact($product));
+        ->select('products.name','products.id','wholesale_quantity_units')->first();
+        return View('admin.store.product_form',compact('product','product_id','store_id'));
     }
 
-    public function updateStoreProduct($product_id){
+    public function updateStoreProduct(StoreProductRequest $request){
+        $product = Product::where('id',$request->product_id)->select('wholesale_quantity_units')->first();
+        $store_product = StoreProduct::where('product_id',$request->product_id)->where('store_id',$request->store_id)->first();
+        $quantity = $product->wholesale_quantity_units;
+        $buy_price = $store_product->buy_price/$quantity;
+        $store_product->update([
+            "reorder_limit"             => $request->reorder_limit,
+            "lower_limit"               => $request->lower_limit,
+            "max_limit"                 => $request->max_limit,
+            "sell_wholesale_price"      => $request->sell_wholesale_price,
+            "sell_item_price"           => $request->sell_item_price,
+            "unit_gain_ratio"           => ((($request->sell_item_price - $buy_price) / $buy_price)* 100 ),
+            "wholesale_gain_ratio"      => ((($request->sell_wholesale_price - $store_product->buy_price) / $store_product->buy_price) * 100),
+            "wholesale_gain_value"      => $request->sell_wholesale_price - $store_product->buy_price,
+            "unit_gain_value"           => $request->sell_item_price - $buy_price,
+            "loss"                      => (Double) $request->loss,
+        ]);
 
+        return redirect()->route('admin.get-store-products',$request->store_id)->with('success','تم تعديل المنتج بنجاح');
     }
 
     /**
@@ -150,7 +179,7 @@ class StoreController extends Controller
      * @param  \App\Models\Store  $store
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Store $store)
+    public function update(StoreRequest $request, Store $store)
     {
         $store->update([
             'name' => $request->name,
@@ -179,6 +208,10 @@ class StoreController extends Controller
      */
     public function destroy(Store $store)
     {
-        //
+        $recepits =Receipt::where('store_id',$store->id)->pluck('id');
+        ReceiptProduct::whereIn('receipt_id', $recepits)->delete();
+        Receipt::where('store_id',$store->id)->delete();
+        StoreProduct::where('store_id',$store->id)->delete();
+        $store->delete();
     }
 }

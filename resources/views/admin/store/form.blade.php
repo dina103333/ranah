@@ -67,6 +67,9 @@
                         </select>
                     </div>
                 </div>
+                @if ($errors->has('storekeepers'))
+                    <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('storekeepers') }}</span>
+                @endif
 
                 <div id="kt_modal_add_customer_billing_info" class="collapse show">
                     <div class="d-flex flex-column mb-7 fv-row">
@@ -82,7 +85,9 @@
                         </select>
                     </div>
                 </div>
-
+                @if ($errors->has('storekeeper_id'))
+                    <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('storekeeper_id') }}</span>
+                @endif
 
                 <div id="kt_modal_add_customer_billing_info" class="collapse show">
                     <div class="d-flex flex-column mb-7 fv-row">
@@ -100,7 +105,9 @@
                         </select>
                     </div>
                 </div>
-
+                @if ($errors->has('finance_officers'))
+                    <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('finance_officers') }}</span>
+                @endif
 
                 <div id="kt_modal_add_customer_billing_info" class="collapse show">
                     <div class="d-flex flex-column mb-7 fv-row">
@@ -116,6 +123,9 @@
                         </select>
                     </div>
                 </div>
+                @if ($errors->has('finance_officer_id'))
+                    <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('finance_officer_id') }}</span>
+                @endif
 
 
                 <div id="kt_modal_add_customer_billing_info" class="collapse show">
@@ -133,7 +143,9 @@
                         </select>
                     </div>
                 </div>
-
+                @if ($errors->has('sales'))
+                    <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('sales') }}</span>
+                @endif
                 <div id="kt_modal_add_customer_billing_info" class="collapse show">
                     <div class="d-flex flex-column mb-7 fv-row">
                         <label class="fs-6 fw-bold mb-2">
@@ -153,7 +165,6 @@
                     <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('status') }}</span>
                 @endif
             </div>
-
         </div>
     </div>
 </div>
