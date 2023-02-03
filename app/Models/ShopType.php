@@ -11,6 +11,10 @@ class ShopType extends Model
     use HasFactory;
     protected $table = 'shope_types';
     protected $guarded=[];
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
 
     public static function getEnumValues($table, $column) {

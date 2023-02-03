@@ -14,6 +14,7 @@ use App\Models\Receipt;
 use App\Models\ReceiptProduct;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use App\Models\Treasury;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use PhpParser\Node\Expr\Cast\Double;
@@ -73,6 +74,7 @@ class StoreController extends Controller
         ]);
         Admin::whereIn('id',$request->finance_officers)->update(['store_id'=>$store->id]);
         Admin::whereIn('id',$request->storekeepers)->update(['store_id'=>$store->id]);
+        Treasury::create(['store_id'=>$store->id]);
         return redirect()->route('admin.stores.index')->with('success','تم اضافه المخزن بنجاح');
     }
 

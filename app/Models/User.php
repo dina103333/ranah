@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
+
 
 class User extends Authenticatable
 {
@@ -39,4 +41,24 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function shop(){
+        return $this->belongsTo(Shop::class,'shop_id');
+    }
+
+    public function add(){
+        return $this->belongsTo(Seller::class,'seller_id');
+    }
+
+    public static function getEnumValues($table, $column) {
+        $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;
+        preg_match('/^enum\((.*)\)$/', $type, $matches);
+        $enum = array();
+        foreach( explode(',', $matches[1]) as $value )
+        {
+            $v = trim( $value, "'" );
+            $enum[] = $v;
+        }
+        return $enum;
+    }
 }

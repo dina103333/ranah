@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use  Illuminate\Support\Facades\Schema;
-
+use Illuminate\Http\Resources\Json\JsonResource ;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-        //
+        config(['global.username' => \App\Models\Setting::where('key','sms_username')->first()->value]);
+        config(['global.Password' => \App\Models\Setting::where('key','sms_password')->first()->value]);
+        config(['global.sender' => \App\Models\Setting::where('key','sms_sender')->first()->value]);
+
+        JsonResource::withoutWrapping();
     }
 }

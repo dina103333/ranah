@@ -24,7 +24,7 @@ class CreateOrdersTable extends Migration
             $table->unsignedBigInteger('discount_id')->nullable();
             $table->float('discount_price')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-            $table->enum('status',['جاري المعالجه','تم التأكيد','جاري التحضير','في الطريق','تم التسليم']);
+            $table->enum('status',['معلق','جاري المعالجه','تم التأكيد','جاري التحضير','في الطريق','تم التسليم']);
             $table->timestamps();
         });
     }

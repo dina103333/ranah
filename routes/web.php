@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -75,17 +76,11 @@ Route::group([
     Route::post('/products/export/', [ProductController::class, 'export'])->name('products.export');
     Route::resource('/products', ProductController::class);
     Route::get('/get-products', [ProductController::class, 'getProducts'])->name('get-products');
-    Route::get('/get-categories/{company_id}', [ProductController::class, 'getCompanyCategories'])->name('get-categories');
+    Route::get('/get-company-categories/{company_id}', [ProductController::class, 'getCompanyCategories'])->name('get-company-categories');
     Route::get('/change-quantity', [ProductController::class, 'changeQuantityStatus'])->name('change-quantity');
     Route::get('/change-status', [ProductController::class, 'changeStatus'])->name('change-status');
     Route::get('/update-product-quantity', [ProductController::class, 'updateProductQuantity'])->name('update-product-quantity');
 
-    Route::resource('/products',ProductController::class);
-    Route::get('/get-products',[ProductController::class,'getProducts'])->name('get-products');
-    Route::get('/get-categories/{company_id}',[ProductController::class,'getCompanyCategories'])->name('get-categories');
-    Route::get('/change-quantity',[ProductController::class,'changeQuantityStatus'])->name('change-quantity');
-    Route::get('/change-status',[ProductController::class,'changeStatus'])->name('change-status');
-    Route::get('/update-product-quantity',[ProductController::class,'updateProductQuantity'])->name('update-product-quantity');
 
     Route::resource('/stores',StoreController::class);
     Route::get('/get-stores',[StoreController::class,'getStores'])->name('get-stores');
@@ -126,5 +121,11 @@ Route::group([
     Route::resource('/shops', ShopController::class);
     Route::get('/get-shops', [ShopController::class, 'getShops'])->name('get-shops');
     Route::delete('/multiShopsDelete', [ShopController::class, 'multiShopsDelete']);
+
+
+    Route::resource('/users', UserController::class);
+    Route::get('/get-users', [UserController::class, 'getUsers'])->name('get-users');
+    Route::get('/users-change-status', [UserController::class, 'changeStatus'])->name('users-change-status');
+    Route::delete('/multiUsersDelete', [UserController::class, 'multiUsersDelete']);
 
 });

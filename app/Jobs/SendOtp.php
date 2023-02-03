@@ -33,16 +33,15 @@ class SendOtp implements ShouldQueue
      */
     public function handle()
     {
-        $result = Http::
+        Http::
         withOptions([
             'verify' => false,
         ])
         ->post("https://smssmartegypt.com/sms/api/otp-send",[
-            'username'=>'RNAeg',
-            'Password'=>'56D486C9*v',
-            'sender'=>'RNA eg',
+            'username'=> config('global.username'),
+            'Password'=>config('global.Password'),
+            'sender'=>config('global.sender'),
             'mobile'=>$this->mobile_number
         ]);
-        // return $result->body();
     }
 }

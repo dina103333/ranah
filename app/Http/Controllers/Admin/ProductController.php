@@ -46,7 +46,8 @@ class ProductController extends Controller
     }
 
     public function getCompanyCategories($company_id){
-        $categories = Category::whereHas('companies',function($q) use($company_id){
+        $categories = Category::where('parent_id','!=',null)
+        ->whereHas('companies',function($q) use($company_id){
             $q->where('companies_categories.company_id',$company_id);
         })->select('id','name')->get();
         return $categories;
@@ -135,6 +136,7 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product)
     {
+        // return $request;
         $product->update($request->except(['image']));
         if($request->file('image')){
             $file = $request->file('image')->store('public/files');

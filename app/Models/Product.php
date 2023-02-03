@@ -23,6 +23,14 @@ class Product extends Model
                     'max_limit','reorder_limit','buy_price','unit_gain_ratio','wholesale_gain_ratio','wholesale_gain_value','unit_gain_value',
                      'loss','production_date','expiry_date');
     }
+    public function carts(){
+        return $this->belongsToMany(Cart::class,'cart_products','product_id','cart_id')
+        ->withPivot('wholesale_quantity','unit_quantity','wholesale_price','unit_price','wholesale_total','unit_total');
+    }
+    public function orders(){
+        return $this->belongsToMany(Order::class,'orders_products','product_id','order_id')
+        ->withPivot('current_unit_quantity','current_wholesale_quantity','unit_price','wholesale_price','total');
+    }
 
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;
@@ -40,4 +48,10 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function totalSold()
+    {
+        return $this->hasMany(OrderProduct::class)->selectRaw('product_id, sum(quantity) as total_sold')->groupBy('product_id');
+    }
+
 }

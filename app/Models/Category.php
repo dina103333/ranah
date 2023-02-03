@@ -17,7 +17,7 @@ class Category extends Model
     }
 
     public function companies(){
-        return $this->belongsToMany(Company::class , 'companies_categories','company_id','category_id');
+        return $this->belongsToMany(Company::class,'companies_categories','category_id','company_id');
     }
 
     public static function getEnumValues($table, $column) {

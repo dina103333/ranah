@@ -14,7 +14,7 @@ trait ApiResponse
      * @param array $headers
      * @return JsonResponse
      */
-    public function success(string $message,array $data, int $code = 200): JsonResponse
+    public function success(string $message,array $data, int $code = 200)
     {
         return response()->json([
             'success' => true,

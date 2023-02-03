@@ -42,7 +42,7 @@
             event.preventDefault();
             let company_id = $( this ).val();
             $.ajax({
-                url: '/admin/get-categories/'+company_id,
+                url: '/admin/get-company-categories/'+company_id,
                 type: 'get',
                 data: {
                     _method : 'get',
