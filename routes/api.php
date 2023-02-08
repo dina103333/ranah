@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ShopController;
 use App\Http\Controllers\Api\ShopTypeController;
+use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,6 +43,7 @@ Route::get('/get-products', [ProductController::class, 'getProducts']);
 Route::get('/show-product', [ProductController::class, 'showProduct']);
 Route::get('/get-search-products', [ProductController::class, 'SearchProducts']);
 Route::get('/beast-selling-products', [ProductController::class, 'bestSellingProducts']);
+Route::get('/sliders', [SliderController::class, 'getSliders']);
 
 Route::post('/verify-otp-code-reset', [LoginController::class, 'verifyOtpCode']);
 Route::post('/reset-password', [LoginController::class, 'restPassword']);
@@ -76,6 +78,7 @@ Route::middleware(['auth_api:sanctum'])->group(function () {
 
     Route::get('/user-info', [UserController::class, 'getUserInfo']);
     Route::post('/update-info', [UserController::class, 'UpdateUser']);
+    Route::post('/delete-user', [UserController::class, 'deactiveUser']);
 
 
     Route::post('/add-comment', [ComplaintController::class, 'addComplaint']);

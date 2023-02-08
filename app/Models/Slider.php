@@ -5,20 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
 
-class Driver extends Authenticatable
+class Slider extends Model
 {
-    use HasFactory,HasApiTokens;
-    protected $guarded = [];
-
+    use HasFactory;
     protected $hidden = [
-        'password',
         'created_at',
         'updated_at',
-        'id'
     ];
+
+    protected $guarded=[];
+
+    public function products(){
+        return $this->belongsToMany(Product::class,'slider_products','slider_id','product_id');
+    }
+
+
+
+
 
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;

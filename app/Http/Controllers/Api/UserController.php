@@ -45,6 +45,10 @@ class UserController extends Controller
         return $this->successSingle('تم تعديل البيانات بنجاح',[],200);
     }
 
+    public function deactiveUser(Request $request){
+        $request->user()->update(['status' => 'حظر','active' =>false]);
+        return $this->successSingle('تم بنجاح',[],200);
+    }
 
 
 }

@@ -164,5 +164,14 @@
         <span class="menu-title">الطلبات </span>
     </a>
 </div>
+<div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.sliders.index'? 'active' : '' }} "
+         href="{{route('admin.sliders.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">اسليدرز </span>
+    </a>
+</div>
 
 

@@ -36,6 +36,7 @@ class OrderController extends Controller
             'distance'      => (Double) number_format($distance),
             'fee'           => 10,
             'status'        => 'معلق',
+            'user_id'        => $request->auth()->user()->id,
         ]);
         $this->addOrderProducts($order,$cart);
         $this->removeCart($cart);
@@ -59,7 +60,7 @@ class OrderController extends Controller
             ]);
             $total[]= $products->total;
         }
-        $order->update(['total' => array_sum($total) + $order->fee]);
+        $order->update(['total' => array_sum($total) + ($order->fee * $order->distance)]);
     }
 
     function removeCart($cart){

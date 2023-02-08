@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SellerController;
 use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -127,5 +128,9 @@ Route::group([
     Route::get('/get-users', [UserController::class, 'getUsers'])->name('get-users');
     Route::get('/users-change-status', [UserController::class, 'changeStatus'])->name('users-change-status');
     Route::delete('/multiUsersDelete', [UserController::class, 'multiUsersDelete']);
+
+    Route::resource('/sliders', SliderController::class);
+    Route::get('/get-sliders', [SliderController::class, 'getSliders'])->name('get-sliders');
+    Route::delete('/multiSlidersDelete', [SliderController::class, 'multiSlidersDelete']);
 
 });
