@@ -18,7 +18,6 @@
     @endif
 
 
-
     <div id="kt_modal_add_customer_billing_info" class="collapse show">
         <div class="d-flex flex-column mb-7 fv-row">
             <label class="fs-6 fw-bold mb-2">

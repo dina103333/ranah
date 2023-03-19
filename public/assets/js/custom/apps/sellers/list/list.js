@@ -76,7 +76,7 @@ var KTCustomersList = function () {
                 {data: 'id'},
                 {data: 'name'},
                 {data: 'mobile_number'},
-                {data: 'address'},
+                {data: 'id'},
                 {data: 'id'},
             ],
             columnDefs: [
@@ -89,6 +89,15 @@ var KTCustomersList = function () {
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
                                 <input class="form-check-input checkbox" type="checkbox" data-id="${data}" value="${data}" />
                             </div>`;
+                    }
+                },
+                {
+                    targets: 3,
+                    orderable: false,
+                    searchable: false,
+                    render: function (data) {
+                        return `
+                        <a class="btn btn-info" href='/admin/generate-qr/${data}' class=" px-3"></i> qr code</a>`;
                     }
                 },
                 {

@@ -149,7 +149,7 @@
                             </div>
                             <div class="separator my-2"></div>
                             <div class="menu-item px-5 my-1">
-                                <a href="../../demo13/dist/account/settings.html" class="menu-link px-5">
+                                <a href="{{route('admin.edit-setting')}}" class="menu-link px-5">
                                     الاعدادات</a>
                             </div>
                             <div class="menu-item px-5">

@@ -19,6 +19,7 @@ class UserResource extends JsonResource
             'mobile_number' => $this->mobile_number,
             'seconde_mobile_number' => $this->seconde_mobile_number == null ? '' : $this->seconde_mobile_number,
             'status'=> $this->status,
+            'points'=> $this->points,
             'change_location'=> $this->change_location == true ? true : false,
             'shop_name' => $this->shop->name,
             'shop_address' => $this->shop->address,

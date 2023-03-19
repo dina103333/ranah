@@ -34,7 +34,9 @@ class ProductController extends Controller
         ->whereHas('stores',function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
-        })->with(['stores'=>function($q) use($store){
+        })->with(['store_discounts'=>function($q) use ($store){
+            $q->where('discount_products.store_id',$store->id)->where('status','تفعيل');
+        },'stores'=>function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
         }])->paginate(6);
@@ -59,13 +61,19 @@ class ProductController extends Controller
         ->whereHas('stores',function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
-        })->with(['stores'=>function($q) use($store){
+        })->with(['store_discounts'=>function($q) use ($store){
+            $q->where('discount_products.store_id',$store->id);
+        },'stores'=>function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
         },'carts'=>function($q) use($store){
             $q->where('carts.store_id',$store->id);
         }])->first();
-        return  $this->successSingle('تم بنجاح',ShowProductResource::make($products),200);
+        if($products){
+            return $this->successSingle('تم بنجاح',ShowProductResource::make($products),200);
+        }else{
+            return $this->successSingle('هذا المنتج غير موجود على مخزن',[],422);
+        }
 
     }
 
@@ -91,12 +99,13 @@ class ProductController extends Controller
         ->whereHas('stores',function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
-        })->with(['stores'=>function($q) use($store){
+        })->with(['store_discounts'=>function($q) use ($store){
+            $q->where('discount_products.store_id',$store->id)->where('status','تفعيل');
+        },'stores'=>function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
         }])->paginate(6);
         return  $this->successSingle('تم بنجاح',ProductResource::collection($products)->response()->getData(true),200);
-
     }
 
     public function addComment(ProductCommentRequest $request){
@@ -120,10 +129,40 @@ class ProductController extends Controller
                         ->whereHas('stores',function($q) use($store){
                             $q->where('stores_products.store_id',$store->id)
                             ->where('stores_products.sell_wholesale_price','!=',null);
-                        })->with(['stores'=>function($q) use($store){
+                        })->with(['store_discounts'=>function($q) use ($store){
+                            $q->where('discount_products.store_id',$store->id);
+                        },'stores'=>function($q) use($store){
                             $q->where('stores_products.store_id',$store->id)
                             ->where('stores_products.sell_wholesale_price','!=',null);
                         }])->orderByDesc('total_sold_count')->take(5)->get();
         return  $this->successSingle('تم بنجاح',ProductResource::collection($bestSellers)->response()->getData(true),200);
+    }
+
+    public function getDiscountsOfPorducts(Request $request){
+        if(!$request->user()){
+            $store = Store::where('status','تفعيل')->select('id')->first();
+        }else{
+            $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
+            if(!$shop){
+                return  $this->error('هذا المستخدم لم يكمل بيانات المحل الخاص به',422);
+            }
+            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            if(!$store){
+                return  $this->error('لا يوجد مخزن فى هذه المنطقه او قد يكون المخزن غير مفعل',422);
+            }
+        }
+        $products = Product::where('company_id',$request->company_id)
+        ->whereHas('stores',function($q) use($store){
+            $q->where('stores_products.store_id',$store->id)
+            ->where('stores_products.sell_wholesale_price','!=',null);
+        })->whereHas('store_discounts',function($q) use ($store){
+            $q->where('discount_products.store_id',$store->id)->where('status','تفعيل');
+        })->with(['store_discounts'=>function($q) use ($store){
+            $q->where('discount_products.store_id',$store->id);
+        },'stores'=>function($q) use($store){
+            $q->where('stores_products.store_id',$store->id)
+            ->where('stores_products.sell_wholesale_price','!=',null);
+        }])->paginate(6);
+        return  $this->successSingle('تم بنجاح',ProductResource::collection($products)->response()->getData(true),200);
     }
 }

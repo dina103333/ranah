@@ -24,12 +24,13 @@ class ShowProductResource extends JsonResource
             'item_type' =>$this->item_type ,
             'wholesale_quantity_units' =>$this->wholesale_quantity_units ,
             'wholesale_buy_price' =>$this->stores != '[]'?$this->stores[0]->pivot->sell_wholesale_price: 0.00 ,
-            'item_buy_price' =>$this->stores != '[]'?$this->stores[0]->pivot->sell_item_price * $this->wholesale_quantity_units: 0.00 ,
+            'item_buy_price' =>$this->stores != '[]'?$this->stores[0]->pivot->sell_item_price: 0.00 ,
             'available_in_store' =>$this->stores != '[]'?($this->stores[0]->pivot->wholesale_quantity > 0 || $this->stores[0]->pivot->unit_quantity > 0 ? true : false):false,
             'is_available_for_order' =>$this->is_available_for_order == true ? true :false,
             'in_cart' =>$this->carts !='[]' ? true : false,
             'cart_wholesale_quantity' =>$this->carts !='[]' ? $this->carts[0]->pivot->wholesale_quantity : 0,
             'cart_unit_quantity' =>$this->carts !='[]' ? $this->carts[0]->pivot->unit_quantity : 0,
+            'discounts' => ProductDiscountResource::collection($this->store_discounts)
         ];
     }
 }

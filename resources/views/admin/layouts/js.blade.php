@@ -12,3 +12,7 @@
 <script src="/assets/js/custom/apps/invoices/create.js"></script>
 <script src="/assets/js/jQuery.print.min.js"></script>
 
+<script src="/assets/js/custom/account/settings/signin-methods.js"></script>
+<script src="/assets/js/custom/account/settings/profile-details.js"></script>
+<script src="/assets/js/custom/account/settings/deactivate-account.js"></script>
+

@@ -27,17 +27,11 @@ class SellerRequest extends FormRequest
            return [
                'name' => 'required',
                'mobile' => 'required|unique:sellers,mobile_number',
-               'password' => 'required',
-               'status' => 'required',
-               'address' => 'required',
            ];
        }else{
            return [
                'name' => 'required',
                'mobile' => 'required|unique:sellers,mobile_number,'. $this->route()->seller->id,
-               'password' => 'nullable',
-               'status' => 'required',
-               'address' => 'required',
            ];
        }
     }
@@ -47,9 +41,6 @@ class SellerRequest extends FormRequest
             'mobile.required' => 'يجب ادخال رقم الهاتف .',
             'mobile.unique' => '  رقم الهاتف مأخوذ مسبقا',
             'name.required' => 'يجب ادخال الاسم .',
-            'password.required' => 'يجب ادخال كلمه المرور .',
-            'status.required' => 'يجب اخيار الحاله .',
-            'address.required' => 'يجب ادخال العنوان .',
         ];
     }
 }

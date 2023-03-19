@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-
+use App\Http\Resources\Api\Driver\ProductResource;
 class OrderProductResource extends JsonResource
 {
     /**
@@ -14,19 +14,35 @@ class OrderProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        if($this->discount_price != null){
+            if($this->discounts_sum_value != null){
+                $discount_price = $this->total - $this->discount_price - $this->discounts_sum_value ;
+            }else{
+                $discount_price = $this->total - $this->discount_price ;
+            }
+        }else{
+            if($this->discounts_sum_value != null){
+                $discount_price = $this->total -  $this->discounts_sum_value ;
+            }else{
+                $discount_price = $this->total ;
+            }
+        }
         return [
-            'id'                            => $this->id,
-            'name'                          => $this->name,
-            'image_url'                     => url('/storage/'.$this->image) ,
-            'wholesale_type'                => $this->wholesale_type,
-            'item_type'                     => $this->item_type,
-            'selling_type'                  => $this->selling_type,
-            'wholesale_quantity_units'      => $this->wholesale_quantity_units,
-            'wholesale_quantity'            => $this->orders[0]->pivot->current_wholesale_quantity,
-            'unit_quantity'                 => $this->orders[0]->pivot->current_unit_quantity,
-            'wholesale_price'               => $this->orders[0]->pivot->wholesale_price,
-            'unit_price'                    => $this->orders[0]->pivot->unit_price,
-            'total'                         => $this->orders[0]->pivot->total,
+            "id"=> $this->id,
+            "sub_total"=> $this->sub_total,
+            "total"=> $this->total == 0 ? $this->sub_total + ($this->distance * $this->fee) : $this->total,
+            "distance"=> $this->distance,
+            "fee"=> $this->fee,
+            'discount' =>$this->discount_price == null ? 0.00 : $this->discount_price,
+            'product_discount' =>$this->discounts_sum_value == null ? 0.00 : $this->discounts_sum_value,
+            'promo_code_discount' =>$this->promo == null ? 0.00 : $this->promo->value,
+            'total_after_discount' => $this->promo == null ? $discount_price : $discount_price - $this->promo->value,
+            "status"=> $this->status,
+            "created_at"=> $this->created_at,
+            'delivered_to_driver' =>$this->delivered_to_driver == true ? true : false,
+            'is_completed' =>$this->status == 'تم التسليم'? true : false,
+            'payment_method' =>$this->total == 0 ? 'تم الدفع باستخدام المحفظه' : ($this->discount_price == null ? 'يتم تحصيل قيمه الطلب كاش من العميل' : 'يتم تحصيل باقى قيمه الطلب كاش من العميل'),
+            'products' => ProductResource::collection($this->products),
         ];
     }
 }

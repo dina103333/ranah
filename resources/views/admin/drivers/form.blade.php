@@ -1,5 +1,23 @@
 @csrf
 <div class="modal-body py-10 px-lg-17" >
+
+    <div id="kt_modal_add_customer_billing_info" class="collapse show">
+        <div class="d-flex flex-column mb-7 fv-row">
+            <label class="fs-6 fw-bold mb-2">
+                <span class="required">المخزن</span>
+            </label>
+            <select name="store_id" aria-label="Select a Country" data-placeholder="اختر المخزن" data-control="select2"  class="form-select form-select-solid fw-bolder">
+                <option value="">اختر المخزن </option>
+                @foreach ($stores as $store)
+                    <option value="{{$store->id}}" {{isset($driver) ?( $store->id == $driver->store_id ?'selected' : '') : ''}}>{{$store->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    @if ($errors->has('store_id'))
+        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('store_id') }}</span>
+    @endif
+
     <div class="fv-row mb-7">
         <label class="required fs-6 fw-bold mb-2">اسم السائق</label>
         <input type="text" class="form-control form-control-solid" placeholder="" name="name" value="{{isset($driver) ?$driver->name :old('name')}}" />

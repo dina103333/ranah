@@ -6,6 +6,7 @@ use App\Exports\DriversExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DriverRequest;
 use App\Models\Driver;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -36,7 +37,8 @@ class DriverController extends Controller
     public function create()
     {
         $status = Driver::getEnumValues('drivers','status');
-        return view('admin.drivers.create',compact('status'));
+        $stores = Store::where('status','تفعيل')->get();
+        return view('admin.drivers.create',compact('status','stores'));
     }
 
     /**
@@ -53,6 +55,7 @@ class DriverController extends Controller
             'password' => bcrypt($request->password),
             'status' =>$request->status,
             'address' =>$request->address,
+            'store_id' =>$request->store_id,
         ]);
 
         return redirect()->route('admin.drivers.index')->with('success','تم اضافه سائق بنجاح');
@@ -78,7 +81,8 @@ class DriverController extends Controller
     public function edit(Driver $driver)
     {
         $status = Driver::getEnumValues('drivers','status');
-        return view('admin.drivers.edit',compact('driver','status'));
+        $stores = Store::where('status','تفعيل')->get();
+        return view('admin.drivers.edit',compact('driver','status','stores'));
     }
 
     /**
@@ -96,6 +100,7 @@ class DriverController extends Controller
             'password' => $request->password ? bcrypt($request->password) : $driver->password,
             'status' =>$request->status,
             'address' =>$request->address,
+            'store_id' =>$request->store_id,
         ]);
 
         return redirect(route('admin.drivers.index'))->with('success','تم تعديل سائق بنجاح');

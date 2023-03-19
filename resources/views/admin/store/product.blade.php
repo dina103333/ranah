@@ -28,6 +28,14 @@
                             <input type="text" data-kt-role-table-filter="search" class="form-control form-control-solid w-250px ps-15" placeholder="بحث" />
                         </div>
                     </div>
+                    <div class="card-toolbar">
+                        <div class="d-flex justify-content-end" data-kt-role-table-toolbar="base">
+                            <a href="{{route('admin.create-transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">نقل بضاعه</a>
+                            <a href="{{route('admin.transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">البضاعه المنقوله للمخزن</a>
+                            <a href="#" type="button" class="btn btn-light-primary me-3">الايرادات</a>
+                            <a href="#" type="button" class="btn btn-light-primary me-3">المصروفات</a>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body pt-0">
                     @include('flash-message')

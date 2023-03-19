@@ -50,6 +50,15 @@ class User extends Authenticatable
         return $this->belongsTo(Seller::class,'seller_id');
     }
 
+    public function orders(){
+        return $this->hasMany(Order::class);
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;
         preg_match('/^enum\((.*)\)$/', $type, $matches);

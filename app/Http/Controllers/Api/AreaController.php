@@ -12,7 +12,7 @@ class AreaController extends Controller
 {
     use ApiResponse;
     public function getAllAreas(){
-        $areas = Area::where('status','تفعيل')->select('id','name')->get();
+        $areas = Area::whereHas('store')->where('status','تفعيل')->select('id','name')->get();
         return $this->successSingle('تم بنجاح', $areas, 200);
     }
 

@@ -30,6 +30,7 @@ class DriverRequest extends FormRequest
                 'password' => 'required',
                 'status' => 'required',
                 'address' => 'required',
+                'store_id' => 'required',
             ];
         }else{
             return [
@@ -38,6 +39,7 @@ class DriverRequest extends FormRequest
                 'password' => 'nullable',
                 'status' => 'required',
                 'address' => 'required',
+                'store_id' => 'required',
             ];
         }
     }

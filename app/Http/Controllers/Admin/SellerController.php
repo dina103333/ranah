@@ -8,6 +8,8 @@ use App\Http\Requests\Admin\SellerRequest;
 use App\Models\Seller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class SellerController extends Controller
 {
@@ -24,7 +26,7 @@ class SellerController extends Controller
 
     public function getSellers()
     {
-        $sellers = Seller::latest()->select('id','name', 'mobile_number', 'address');
+        $sellers = Seller::latest()->select('id','name', 'mobile_number');
         return datatables($sellers)->make(true);
     }
 
@@ -35,8 +37,7 @@ class SellerController extends Controller
      */
     public function create()
     {
-        $status = Seller::getEnumValues('sellers','status');
-        return view('admin.sellers.create',compact('status'));
+        return view('admin.sellers.create');
     }
 
     /**
@@ -50,12 +51,26 @@ class SellerController extends Controller
         $seller = Seller::create([
             'name' =>$request->name,
             'mobile_number' =>$request->mobile,
-            'password' => bcrypt($request->password),
-            'status' =>$request->status,
-            'address' =>$request->address,
         ]);
 
         return redirect()->route('admin.sellers.index')->with('success','تم اضافه بائع بنجاح');
+    }
+
+    public function generateQrCode($seller_id){
+
+        $seller = Seller::where('id',$seller_id)->first();
+        $code = Str::slug($seller->id) . '.' . 'png';
+
+        $arrData = [
+            'id'  => $seller->id
+        ];
+        $body = json_encode($arrData);
+        QrCode::format('png')
+                ->size(500)->errorCorrection('H')
+                ->generate($body, '../public/qr_code/' . $code);
+        $qr_code_url= url('qr_code/'.$code);
+        return view('admin.sellers.qr',compact('qr_code_url'));
+                // return response()->json(['qr_code_url'=>url('qr_code/'.$code)]) ;
     }
 
     /**
@@ -77,8 +92,7 @@ class SellerController extends Controller
      */
     public function edit(Seller $seller)
     {
-        $status = Seller::getEnumValues('sellers','status');
-        return view('admin.sellers.edit',compact('seller','status'));
+        return view('admin.sellers.edit',compact('seller'));
     }
 
     /**
@@ -93,9 +107,6 @@ class SellerController extends Controller
         $seller->update([
             'name' =>$request->name,
             'mobile_number' =>$request->mobile,
-            'password' => $request->password ? bcrypt($request->password) : $seller->password,
-            'status' =>$request->status,
-            'address' =>$request->address,
         ]);
 
         return redirect(route('admin.sellers.index'))->with('success','تم تعديل بائع بنجاح');

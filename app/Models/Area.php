@@ -15,6 +15,10 @@ class Area extends Model
         'updated_at',
     ];
 
+    public function store(){
+        return $this->hasOne(Store::class);
+    }
+
     public static function getEnumValues($table, $column) {
         $type = DB::select(DB::raw("SHOW COLUMNS FROM $table WHERE Field = '{$column}'"))[0]->Type ;
         preg_match('/^enum\((.*)\)$/', $type, $matches);

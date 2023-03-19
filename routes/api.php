@@ -43,7 +43,11 @@ Route::get('/get-products', [ProductController::class, 'getProducts']);
 Route::get('/show-product', [ProductController::class, 'showProduct']);
 Route::get('/get-search-products', [ProductController::class, 'SearchProducts']);
 Route::get('/beast-selling-products', [ProductController::class, 'bestSellingProducts']);
+Route::get('/get-discounts-of-products', [ProductController::class, 'getDiscountsOfPorducts']);
+
+
 Route::get('/sliders', [SliderController::class, 'getSliders']);
+Route::get('/slider-products', [SliderController::class, 'getSliderProducts']);
 
 Route::post('/verify-otp-code-reset', [LoginController::class, 'verifyOtpCode']);
 Route::post('/reset-password', [LoginController::class, 'restPassword']);
@@ -63,6 +67,7 @@ Route::middleware(['auth_api:sanctum'])->group(function () {
     Route::get('/get-auth-search-products', [ProductController::class, 'SearchProducts']);
     Route::post('/product_comment', [ProductController::class, 'addComment']);
     Route::get('/beast-selling-products-auth', [ProductController::class, 'bestSellingProducts']);
+    Route::get('/get-auth-discounts-of-products', [ProductController::class, 'getDiscountsOfPorducts']);
 
 
     Route::post('/add-cart-products', [CartController::class, 'addCartProducts']);
@@ -79,6 +84,7 @@ Route::middleware(['auth_api:sanctum'])->group(function () {
     Route::get('/user-info', [UserController::class, 'getUserInfo']);
     Route::post('/update-info', [UserController::class, 'UpdateUser']);
     Route::post('/delete-user', [UserController::class, 'deactiveUser']);
+    Route::get('/wallet', [UserController::class, 'getWalletValue']);
 
 
     Route::post('/add-comment', [ComplaintController::class, 'addComplaint']);

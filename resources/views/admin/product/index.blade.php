@@ -55,7 +55,9 @@
                                                             </span>
                                 Export
                             </button>
-                            <a href="{{route('admin.products.create')}}" type="button" class="btn btn-primary">اضافه
+                            <a href="{{route('admin.create-imported-products')}}" type="button" class="btn btn-light-primary me-3">اضافه
+                                منتجات من ملف</a>
+                            <a href="{{route('admin.products.create')}}" type="button" class="btn btn-primary ">اضافه
                                 منتج</a>
                         </div>
                         <div class="d-flex justify-content-end align-items-center d-none"
@@ -83,8 +85,6 @@
                             <th class="min-w-100px text-center">الصوره</th>
                             <th class="min-w-100px text-center">اسم المنتج</th>
                             <th class="min-w-100px text-center">تحديد كميه للمنتج</th>
-                            <th class="min-w-100px text-center">الكميه المحدده</th>
-                            <th class="min-w-100px text-center">زرار تحديد الكميه</th>
                             <th class="min-w-100px text-center">ايقاف المنتج</th>
                             <th class="min-w-100px text-center"> الحاله</th>
                             <th class="text-end min-w-70px text-center">الاجراءات</th>

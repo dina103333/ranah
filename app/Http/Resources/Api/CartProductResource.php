@@ -28,6 +28,8 @@ class CartProductResource extends JsonResource
             'unit_price'  => $this->carts[0]->pivot->unit_price,
             'wholesale_total'  => $this->carts[0]->pivot->wholesale_total,
             'unit_total'  => $this->carts[0]->pivot->unit_total,
+            'discount_wholesale' =>'0',
+            'discount_item' =>'0',
         ];
     }
 }

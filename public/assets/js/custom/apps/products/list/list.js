@@ -184,8 +184,6 @@ var KTRolesList = function () {
                 { data: 'id',className: 'text-center'},
                 { data: 'image' ,className: 'text-center'},
                 { data: 'name' ,className: 'text-center'},
-                { data: 'product_quantity' ,className: 'text-center'},
-                { data: 'wholesale_max_quantity',className: 'text-center' },
                 { data: 'id',className: 'text-center' },
                 { data: 'id',className: 'text-center' },
                 { data: 'status',className: 'text-center' },
@@ -218,42 +216,7 @@ var KTRolesList = function () {
                     }
                 },
                 {
-                    targets:4,
-                    orderable: true,
-                    searchable: true,
-                    className: 'text-center',
-                    render: function (data, type, full, meta ) {
-                         let content = `
-                                <div class=" align-items-center text-center form-group">
-                                    <input type="number" onkeyup="update_quantity(this);" id=${full.id} class="form-control quantity" name="max-quantity" value="${data}" style="width: 71%;">
-                                </div>
-                            `;
-                            return content
-                    }
-                },
-                {
-                    targets: 5,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, full, meta ) {
-                         let content = `
-                                <div class=" align-items-center text-center">
-                                    <button onclick="change_quantity(${data})" class="btn btn-light" title="تغيير حاله تحديد كميه المنتج">`
-                                        if(full.product_quantity == 'لا'){
-                                            content+=`<i class="fa fa-check-circle" style="color:#33d933;"></i>`
-                                        }
-                                        else{
-                                            content+=`<i class="fas fa-times" style="color:red;"></i>`
-                                        }
-                                    content+= `</button>
-                                </div>
-                            `;
-                            return content
-                    }
-                },
-                {
-                    targets: 6,
+                    targets: 4,
                     orderable: false,
                     searchable: false,
                     className: 'text-center',

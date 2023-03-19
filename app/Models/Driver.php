@@ -17,7 +17,6 @@ class Driver extends Authenticatable
         'password',
         'created_at',
         'updated_at',
-        'id'
     ];
 
     public static function getEnumValues($table, $column) {

@@ -156,12 +156,103 @@
     </a>
 </div>
 <div class="menu-item">
-    <a class="menu-link "
-         href="#">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.orders.index'? 'active' : '' }} "
+         href="{{route('admin.orders.index')}}">
         <span class="menu-icon">
             <i class="bi bi-grid fs-3"></i>
         </span>
         <span class="menu-title">الطلبات </span>
+    </a>
+</div>
+{{-- <div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.discounts.index'? 'active' : '' }} "
+         href="{{route('admin.discounts.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">الخصومات </span>
+    </a>
+</div> --}}
+
+<div data-kt-menu-trigger="click" class="menu-item menu-accordion
+            {{ Route::currentRouteName() == 'admin.discountproducts.index' ? 'hover show' : (
+                Route::currentRouteName() == 'admin.discountproducts.create' ? 'hover show' : (
+         Route::currentRouteName() == 'admin.promos.index' ? 'hover show' : (
+            Route::currentRouteName() == 'admin.promos.create'? 'hover show' :'')))}} ">
+    <span class="menu-link">
+        <span class="menu-icon">
+            <i class="bi bi-archive fs-3"></i>
+        </span>
+        <span class="menu-title"> الخصومات</span>
+        <span class="menu-arrow"></span>
+    </span>
+    <div class="menu-sub menu-sub-accordion menu-active-bg
+        {{ Route::currentRouteName() == 'admin.discountproducts.index' ? 'show' : (
+            Route::currentRouteName() == 'admin.discountproducts.create' ? 'show' : (
+            Route::currentRouteName() == 'admin.promos.index' ? 'show' : (
+            Route::currentRouteName() == 'admin.promos.create'? 'show' :'')))}} ">
+        {{-- <div class="menu-item">
+            <a class="menu-link {{ Route::currentRouteName() == 'admin.discounts.index'? 'active' : (
+                Route::currentRouteName() == 'admin.discounts.create' ? 'active' :'') }}"
+                href="{{route('admin.discounts.index')}}">
+                <span class="menu-bullet">
+                    <span class="bullet bullet-dot"></span>
+                </span>
+                <span class="menu-title">خصومات الفواتير</span>
+            </a>
+        </div> --}}
+        <div class="menu-item ">
+            <a class="menu-link {{ Route::currentRouteName() == 'admin.discountproducts.index'? 'active' :(
+            Route::currentRouteName() == 'admin.discountproducts.index' ? 'active' : '' )}}"
+            href="{{route('admin.discountproducts.index')}}">
+                <span class="menu-icon">
+                    <i class="bi bi-person fs-2"></i>
+                </span>
+                <span class="menu-title"> خصومات المنتجات</span>
+            </a>
+        </div>
+        <div class="menu-item ">
+            <a class="menu-link {{ Route::currentRouteName() == 'admin.promos.index'? 'active' :(
+            Route::currentRouteName() == 'admin.promos.index' ? 'active' : '' )}}"
+            href="{{route('admin.promos.index')}}">
+                <span class="menu-icon">
+                    <i class="bi bi-person fs-2"></i>
+                </span>
+                <span class="menu-title">كوبونات الخصم</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="menu-item">
+    <a class="menu-link {{ Route::currentRouteName() == 'admin.points.index'? 'active' : '' }} "
+         href="{{route('admin.points.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">النقاط </span>
+    </a>
+</div>
+<div class="menu-item {{ Route::currentRouteName() == 'admin.notifications.index'? 'active' : '' }}">
+    <a class="menu-link"
+         href="{{route('admin.notifications.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">الاشعارات </span>
+    </a>
+</div>
+<div class="menu-item {{ Route::currentRouteName() == 'admin.sms.index'? 'active' : '' }}">
+    <a class="menu-link"
+         href="{{route('admin.sms.index')}}">
+        <span class="menu-icon">
+            <i class="bi bi-grid fs-3"></i>
+        </span>
+        <span class="menu-title">الرسائل النصيه </span>
     </a>
 </div>
 <div class="menu-item">

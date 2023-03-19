@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\UserResource;
-
+use App\Http\Resources\Api\WalletResource;
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\WalletValue;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Facades\Storage;
@@ -50,5 +52,9 @@ class UserController extends Controller
         return $this->successSingle('تم بنجاح',[],200);
     }
 
+    public function getWalletValue(Request $request){
+        $wallet = Wallet::where('user_id',$request->user()->id)->with('values')->first();
+        return $this->successSingle('تم بنجاح',WalletResource::make($wallet),200);
+    }
 
 }

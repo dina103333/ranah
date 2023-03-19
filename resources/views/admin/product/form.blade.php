@@ -82,14 +82,6 @@
 
 
     <div class="fv-row mb-7">
-        <label class="required fs-6 fw-bold mb-2">اقصي كميه متاحه</label>
-        <input type="number" class="form-control form-control-solid" style="direction: rtl" placeholder="" name="wholesale_max_quantity" value="{{isset($product) ? $product->wholesale_max_quantity :' '}}" />
-    </div>
-    @if ($errors->has('wholesale_max_quantity'))
-        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('wholesale_max_quantity') }}</span>
-    @endif
-
-    <div class="fv-row mb-7">
         <label class="required fs-6 fw-bold mb-2">الصوره</label>
         <input type="file" class="form-control form-control-solid" name="image" value="{{isset($product) ?$product->image :old('image')}}" />
     </div>
@@ -127,25 +119,6 @@
                     <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
                         <span>{{$waite}}</span>
                     </label>
-                @endforeach
-            </div>
-        </div>
-    </div>
-    @if ($errors->has('wating'))
-        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('wating') }}</span>
-    @endif
-
-    <div id="kt_modal_add_customer_billing_info" class="collapse show">
-        <div class="d-flex flex-column mb-7 fv-row">
-            <label class="fs-6 fw-bold mb-2">
-                <span class="required">تحديد كميه للمنتج ؟</span>
-            </label>
-            <div class="d-flex">
-                @foreach ($product_quantity as $quantity)
-                <input type="radio" name="product_quantity" class="form-check-input" value="{{$quantity}}" {{isset($product) ?( $quantity == $product->product_quantity ?'checked' : '') : ''}}>
-                <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
-                    <span>{{$quantity}}</span>
-                </label>
                 @endforeach
             </div>
         </div>

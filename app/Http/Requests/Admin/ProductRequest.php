@@ -32,12 +32,10 @@ class ProductRequest extends FormRequest
             'item_type'                 => 'required',
             'wholesale_quantity_units'  => 'required',
             'description'               => 'required',
-            'wholesale_max_quantity'    => 'required',
             'image'                     => $image,
             'selling_type'              => 'required',
             'wating'                    => 'required',
             'status'                    => 'required',
-            'product_quantity'          => 'required',
         ];
     }
 

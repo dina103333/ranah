@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Exports\ProductsExport;
+use App\Exports\ProdutTemplateExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductRequest;
+use App\Imports\ProdutTemplateImport;
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\CompanyCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -69,17 +72,48 @@ class ProductController extends Controller
         return redirect(route('admin.products.index'))->with('success','تم اضافه المنتج بنجاح');
     }
 
-
-    public function changeQuantityStatus(Request $request){
-        $product = Product::where('id',$request->id)->first();
-        if($product->product_quantity == 'نعم'){
-            $product->product_quantity = 'لا';
-            $product->save();
-        }else{
-            $product->product_quantity = 'نعم';
-            $product->save();
-        }
+    public function createImported(){
+        return view('admin.product.create_imported');
     }
+
+    public function storePulckProducts(Request $request){
+
+        $index = count(CompanyCategory::get())+9;
+        $rows = Excel::toArray(new ProdutTemplateImport(), $request->file('excel_file'));
+
+        $startIndex = 0;
+        $length = $index+1;
+
+        array_splice($rows[0], $startIndex, $length);
+        foreach ($rows[0] as $row) {
+            Product::create([
+                'name'                      =>  $row[2],
+                'description'               =>  $row[6],
+                'category_id'              =>  $row[1],
+                'company_id'               =>  $row[0],
+                'wholesale_type'            =>  $row[3],
+                'item_type'                 =>  $row[5],
+                'wholesale_quantity_units'  =>  $row[4],
+                'wating'                    =>  $row[8],
+                'status'                    =>  $row[9],
+                'selling_type'              =>  $row[7],
+                'is_available_for_order'    =>  $row[10] == 'نعم' ? '1' : '0',
+            ]);
+        }
+        return redirect(route('admin.products.index'))->with('success','تم اضافه المنتج بنجاح');
+    }
+
+
+    // public function changeQuantityStatus(Request $request){
+    //     $product = Product::where('id',$request->id)->first();
+    //     if($product->product_quantity == 'نعم'){
+    //         $product->product_quantity = 'لا';
+    //         $product->save();
+    //     }else{
+    //         $product->product_quantity = 'نعم';
+    //         $product->save();
+    //     }
+    // }
     public function changeStatus(Request $request){
         $product = Product::where('id',$request->id)->first();
         if($product->status == 'تفعيل'){
@@ -91,9 +125,9 @@ class ProductController extends Controller
         }
     }
 
-    public function updateProductQuantity(Request $request){
-        Product::where('id',$request->id)->update(['wholesale_max_quantity'=>$request->value]);
-    }
+    // public function updateProductQuantity(Request $request){
+    //     Product::where('id',$request->id)->update(['wholesale_max_quantity'=>$request->value]);
+    // }
 
     /**
      * Display the specified resource.
@@ -161,5 +195,10 @@ class ProductController extends Controller
     public function export()
     {
         return Excel::download(new ProductsExport, 'products.xlsx');
+    }
+
+    public function exportTemplate()
+    {
+        return Excel::download(new ProdutTemplateExport, 'products'.'.xlsx');
     }
 }

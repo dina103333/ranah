@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserRequest;
+use App\Jobs\SendFCMNotificationJob;
 use App\Models\Area;
+use App\Models\Complaint;
+use App\Models\NotifyUser;
 use App\Models\Shop;
 use App\Models\ShopType;
+use App\Models\Store;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -36,6 +41,14 @@ class UserController extends Controller
         }else{
             $user->update(['status' => 'تفعيل']);
         }
+        $type = 'client_status';
+        $title = 'اشعار بحاله العميل';
+        $body = 'تم تغيير حاله الحساب';
+        $id = $request->id;
+        $image = url('/storage/files/logo.png') ;
+        $devices = User::where('id',$request->id)->where('type','اونلاين')->pluck('device_token')->toArray();
+        if(count($devices) > 0)
+            dispatch(new SendFCMNotificationJob($devices, $title, $body,$type,$id,$image));
     }
 
     /**
@@ -59,12 +72,16 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
+        $store = Store::where('area_id',$request->area_id)->first();
+        if(!$store)
+            return redirect()->back()->with('error','لا يمكن انشاء عميل على هذه المنطقه لعدم توافر مخزن فيها');
         $user = User::create([
             'name' => $request->name,
             'mobile_number' => $request->mobile_number,
             'password' => bcrypt($request->password),
             'status' => $request->status,
             'type' => 'مباشر',
+            'store_id' => $store->id,
         ]);
 
         $shop = Shop::create([
@@ -72,9 +89,19 @@ class UserController extends Controller
             'user_id' => $user->id,
             'address' => $request->address,
             'shop_types_id' => $request->shop_type_id,
-            'area_id' => $request->area_id
+            'area_id' => $request->area_id,
+            'store_id' => $store->id,
         ]);
         $user->update(['shop_id'=>$shop->id]);
+
+        if(empty($user->wallet)){
+            Wallet::create([
+                'user_id' => $user->id,
+                'value' => 0,
+                'hold_value' => 0,
+                'hold_product_value' => 0
+            ]);
+        }
         return redirect()->route('admin.users.index')->with('success', 'تم اضافه مستخدم بنجاح');
     }
 
@@ -115,12 +142,16 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
+        $store = Store::where('area_id',$request->area_id)->first();
+        if(!$store)
+            return redirect()->back()->with('error','لا يمكن انشاء عميل على هذه المنطقه لعدم توافر مخزن فيها');
         $user->update([
             'name' => $request->name,
             'mobile_number' => $request->mobile_number,
-            'password' => $request->password != 'null' ? bcrypt($request->password) : $user->password ,
+            'password' => $request->password != null ? bcrypt($request->password) : $user->password ,
             'status' => $request->status,
-            'type' => 'مباشر',
+            'type' => $user->type,
+            'store_id' => $store->id,
         ]);
         if($request->status == 'حظر')
             $user->update(['active' => 0]);
@@ -130,8 +161,20 @@ class UserController extends Controller
             'user_id' => $user->id,
             'address' => $request->address,
             'shop_types_id' => $request->shop_type_id,
-            'area_id' => $request->area_id
+            'area_id' => $request->area_id,
+            'store_id' => $store->id,
         ]);
+        if($request->area_id != $shop->area_id)
+        {
+            $type = 'update-user-store';
+            $title = 'تغيير المنطقه';
+            $body = 'تم تغيير منطقه العميل';
+            $id = $user->id;
+            $image = url('/storage/files/logo.png') ;
+            $devices = User::where('id',$user->id)->where('type','اونلاين')->pluck('device_token')->toArray();
+            if(count($devices) > 0)
+                dispatch(new SendFCMNotificationJob($devices, $title, $body,$type,$id,null,$image));
+        }
         return redirect()->route('admin.users.index')->with('success', 'تم تعديل مستخدم بنجاح');
     }
 
@@ -149,6 +192,8 @@ class UserController extends Controller
     public function multiUsersDelete(Request $request)
     {
         $ids = $request->ids;
+        Complaint::whereIn('user_id',explode(",",$ids))->delete();
+        NotifyUser::whereIn('user_id',explode(",",$ids))->delete();
         User::whereIn('id',explode(",",$ids))->delete();
 
         return response()->json(['status' => true, 'message' => "Records deleted successfully."]);

@@ -85,14 +85,13 @@ class ShopController extends Controller
      * @param  \App\Models\Area  $area
      * @return \Illuminate\Http\Response
      */
-    public function update(ShopTypeRequest $request, ShopType $shop_type)
+    public function update(ShopTypeRequest $request, $shop_type)
     {
         $shop_type = ShopType::find($shop_type);
         $shop_type->update([
             'name' =>$request->name,
             'status' =>$request->status,
         ]);
-
         return redirect()->route('admin.shops.index')->with('success','تم تعديل نوع المحل بنجاح');
     }
 

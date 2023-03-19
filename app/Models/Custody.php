@@ -14,4 +14,8 @@ class Custody extends Model
     ];
     protected $guarded=[];
     protected $table = 'driver_custodies';
+
+    public function order(){
+        return $this->belongsTo(Order::class,'order_id');
+    }
 }

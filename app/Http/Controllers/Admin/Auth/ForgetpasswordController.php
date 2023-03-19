@@ -25,9 +25,9 @@ class ForgetpasswordController extends Controller
             'verify' => false,
         ])
         ->post("https://smssmartegypt.com/sms/api/otp-send",[
-            'username'=>'RNAeg',
-            'Password'=>'56D486C9*v',
-            'sender'=>'RNA eg',
+            'username'=> base64_decode(substr(config('global.username'),5,-5)),
+            'Password'=>base64_decode(substr(config('global.Password'),5,-5)),
+            'sender'=>base64_decode(substr(config('global.sender'),5,-5)),
             'mobile'=>$number
         ]);
         return $result->body();
@@ -54,8 +54,8 @@ class ForgetpasswordController extends Controller
             'verify' => false,
         ])
         ->post("https://smssmartegypt.com/sms/api/otp-check",[
-            'username'=>'RNAeg',
-            'Password'=>'56D486C9*v',
+            'username'=> base64_decode(substr(config('global.username'),5,-5)),
+            'Password'=>base64_decode(substr(config('global.Password'),5,-5)),
             'mobile'=>$request->mobile_number,
             'otp'=>$code
         ]);

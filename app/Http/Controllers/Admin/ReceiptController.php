@@ -56,6 +56,7 @@ class ReceiptController extends Controller
         $products = array_filter($request->products);
         $quantity = array_filter($request->quantity);
         $price = array_filter($request->price);
+
         $production_date = array_filter($request->production_date);
         $expiry_date = array_filter($request->expiry_date);
 
@@ -72,12 +73,13 @@ class ReceiptController extends Controller
 
 
         foreach($products as $Key=>$product){
+            $price = str_replace( ',', '', $price[$Key] );
             ReceiptProduct::create([
                 'receipt_id' => $receipt->id,
                 'product_id' => $product,
                 'quantity' => $quantity[$Key],
-                'buy_price' => $price[$Key],
-                'total' => $quantity[$Key] * $price[$Key],
+                'buy_price' => $price,
+                'total' => $quantity[$Key] * $price,
                 'production_date' => $production_date[$Key],
                 'expiry_date' => $expiry_date[$Key],
             ]);
@@ -142,12 +144,13 @@ class ReceiptController extends Controller
 
         ReceiptProduct::where('receipt_id',$receipt->id)->delete();
         foreach($products as $Key=>$product){
+            $price = str_replace( ',', '', $price[$Key] );
             ReceiptProduct::create([
                 'receipt_id' => $receipt->id,
                 'product_id' => $product,
                 'quantity' => $quantity[$Key],
-                'buy_price' => $price[$Key],
-                'total' => $quantity[$Key] * $price[$Key],
+                'buy_price' => $price,
+                'total' => $quantity[$Key] * $price,
                 'production_date' => $production_date[$Key],
                 'expiry_date' => $expiry_date[$Key],
             ]);

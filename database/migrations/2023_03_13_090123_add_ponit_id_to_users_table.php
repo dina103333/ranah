@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDiscountsTable extends Migration
+class AddPonitIdToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateDiscountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('discounts', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->enum('status',['تفعيل','ايقاف'])->default('تفعيل');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->float('points')->nullable();
         });
     }
 
@@ -28,6 +25,8 @@ class CreateDiscountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('discounts');
+        Schema::table('users', function (Blueprint $table) {
+            //
+        });
     }
 }
