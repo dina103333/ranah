@@ -85,6 +85,7 @@ Route::middleware(['auth_api:sanctum'])->group(function () {
     Route::post('/update-info', [UserController::class, 'UpdateUser']);
     Route::post('/delete-user', [UserController::class, 'deactiveUser']);
     Route::get('/wallet', [UserController::class, 'getWalletValue']);
+    Route::get('/check-promo/{promo}', [UserController::class, 'checkPromo']);
 
 
     Route::post('/add-comment', [ComplaintController::class, 'addComplaint']);

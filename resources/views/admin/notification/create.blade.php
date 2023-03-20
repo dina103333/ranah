@@ -34,12 +34,11 @@
     <script>
         $(".selected_users").hide();
         $(".selected_areas").hide();
-        $(".selected_companies").hide();
         $(".users").click(function() {
             if($(".users").is(":checked")) {
                 $(".selected_users").show(300);
                 $(".selected_areas").hide(200);
-                $(".selected_companies").hide();
+                $(".selected_companies").show(200);
                 $(".products").show(200);
             }
         });
@@ -47,7 +46,7 @@
             if($(".all").is(":checked")) {
                 $(".selected_users").hide(200);
                 $(".selected_areas").hide(200);
-                $(".selected_companies").hide();
+                $(".selected_companies").show(200);
                 $(".products").show(200);
             }
         });
@@ -55,7 +54,7 @@
             if($(".active_users").is(":checked")) {
                 $(".selected_users").hide(200);
                 $(".selected_areas").hide(200);
-                $(".selected_companies").hide();
+                $(".selected_companies").show(200);
                 $(".products").show(200);
             }
         });
@@ -63,7 +62,7 @@
             if($(".unactive_users").is(":checked")) {
                 $(".selected_users").hide(200);
                 $(".selected_areas").hide(200);
-                $(".selected_companies").hide();
+                $(".selected_companies").show(200);
                 $(".products").show(200);
             }
         });
@@ -71,16 +70,8 @@
             if($(".areas").is(":checked")) {
                 $(".selected_areas").show(200);
                 $(".selected_users").hide(200);
-                $(".selected_companies").hide();
-                $(".products").show(200);
-            }
-        });
-        $(".companies").click(function() {
-            if($(".companies").is(":checked")) {
                 $(".selected_companies").show(200);
-                $(".selected_areas").hide(200);
-                $(".selected_users").hide(200);
-                $(".products").hide(200);
+                $(".products").show(200);
             }
         });
     </script>

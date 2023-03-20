@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\UserResource;
 use App\Http\Resources\Api\WalletResource;
+use App\Models\PromoCode;
 use App\Models\Shop;
 use App\Models\User;
 use App\Models\Wallet;
@@ -55,6 +56,16 @@ class UserController extends Controller
     public function getWalletValue(Request $request){
         $wallet = Wallet::where('user_id',$request->user()->id)->with('values')->first();
         return $this->successSingle('تم بنجاح',WalletResource::make($wallet),200);
+    }
+
+
+    public function checkPromo($promo){
+        $promo = PromoCode::where('name',$promo)->where('status', 'تفعيل')->first();
+        if($promo){
+            return $this->successSingle('تم بنجاح',$promo->value,200);
+        }else{
+            return $this->error('الرمز خطأ',422);
+        }
     }
 
 }

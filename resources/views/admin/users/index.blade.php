@@ -78,22 +78,22 @@
                 </div>
             </div>
                 <!-- Modal -->
-            <div class="modal fade bd-example-modal-lg users_show" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
+            <div class="modal fade points" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" style="">
+                <div class="modal-dialog">
+                    <div class="modal-content poits_content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">تفاصيل العميل</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <h5 class="modal-title" id="exampleModalLongTitle">نقاط العميل</h5>
+                            <button type="button" class="close" onclick="hideModele()" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
-                          </div>
-                          <div class="modal-body">
+                        </div>
+                        <div class="modal-body model-points">
 
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">اغلاق</button>
-
-                          </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" onclick="deletePoints()">تم تسليم الهديه</button>
+                            <button type="button" class="btn btn-danger" onclick="hideModele()">اغلاق</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,6 +109,32 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+        function hideModele(){
+            $('.points').modal('hide');
+        }
+
+        function deletePoints(){
+            let user_id = $('.user_id').val();
+            $.ajax({
+                url: '/admin/delete-points',
+                type: 'POST',
+                data: {
+                    _method : 'POST',
+                    _token  :  $('meta[name="csrf-token"]').attr('content'),
+                    user_id:user_id
+                },
+                success: function (res) {
+                    $('.points').modal('hide')
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'تم تسليم الهديه للعميل',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                    datatable.ajax.reload();
+                }
+            });
+        }
     </script>
 @endsection
 

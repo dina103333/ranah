@@ -14,4 +14,8 @@ class Wallet extends Model
     public function values(){
         return $this->hasMany(WalletValue::class);
     }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

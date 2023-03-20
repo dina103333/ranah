@@ -90,8 +90,8 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                <button onclick="hideModele()" type="button" class="btn btn-secondary" data-dismiss="modal">اغلاق</button>
-                <button onclick="saveDriver()" type="button" class="btn btn-primary">حفظ</button>
+                    <button onclick="hideModele()" type="button" class="btn btn-secondary" data-dismiss="modal">اغلاق</button>
+                    <button onclick="saveDriver()" type="button" class="btn btn-primary">حفظ</button>
                 </div>
             </div>
             </div>

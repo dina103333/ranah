@@ -91,6 +91,25 @@
     @if ($errors->has('status'))
         <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('status') }}</span>
     @endif
+
+    <div id="kt_modal_add_customer_billing_info" class="collapse show">
+        <div class="d-flex flex-column mb-7 fv-row">
+            <label class="fs-6 fw-bold mb-2">
+                <span class="required">تفعيل تغيير الموقع؟</span>
+            </label>
+            <div class="d-flex">
+                <input type="radio" name="change_location" class="form-check-input" value="1" {{isset($user) ?( $user->change_location == true ?'checked' : '') : ''}}>
+                <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
+                    <span>نعم</span>
+                </label>
+
+                <input type="radio" name="change_location" class="form-check-input" value="0" {{isset($user) ?( $user->change_location == false ?'checked' : '') : ''}}>
+                <label class="form-check-label" style="margin-left: 23px;margin-right: 10px;">
+                    <span>لا</span>
+                </label>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="modal-footer flex-center">
     <button type="submit"  class="btn btn-primary">

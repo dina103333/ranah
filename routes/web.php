@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\SmsController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TransferController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WalletController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -142,6 +143,7 @@ Route::group([
     Route::get('/get-users', [UserController::class, 'getUsers'])->name('get-users');
     Route::get('/users-change-status', [UserController::class, 'changeStatus'])->name('users-change-status');
     Route::delete('/multiUsersDelete', [UserController::class, 'multiUsersDelete']);
+    Route::post('/delete-points', [UserController::class, 'deletePoints']);
 
     Route::resource('/sliders', SliderController::class);
     Route::get('/get-sliders', [SliderController::class, 'getSliders'])->name('get-sliders');
@@ -200,5 +202,11 @@ Route::group([
     Route::resource('/promos', PromoCodeController::class);
     Route::get('/get-promos', [PromoCodeController::class, 'getPromos'])->name('get-promos');
     Route::delete('/multiPromoDelete', [PromoCodeController::class, 'multiPromoDelete'])->name('multiPromoDelete');
+
+
+    Route::get('/user-wallet/{user_id}', [WalletController::class, 'DisplayUserWallet'])->name('user-wallet');
+    Route::get('/get-user-wallet/{wallet_id}', [WalletController::class, 'getUserWallet'])->name('get-user-wallet');
+    Route::get('/edit-wallet-value/{wallet_id}', [WalletController::class, 'edit'])->name('edit-wallet-value');
+    Route::put('/update-wallet-value/{wallet_id}', [WalletController::class, 'update'])->name('update-wallet-value');
 
 });

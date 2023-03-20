@@ -66,8 +66,8 @@ class ProductController extends Controller
         },'stores'=>function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
-        },'carts'=>function($q) use($store){
-            $q->where('carts.store_id',$store->id);
+        },'carts'=>function($q) use($request){
+            $q->where('carts.shop_id',$request->user()->shop_i);
         }])->first();
         if($products){
             return $this->successSingle('تم بنجاح',ShowProductResource::make($products),200);

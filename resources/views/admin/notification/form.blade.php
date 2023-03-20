@@ -12,12 +12,12 @@
           العملاء
         </label>
     </div>
-    <div class="form-check m-4">
+    {{-- <div class="form-check m-4">
         <input class="form-check-input companies" type="radio" name="option" value="companies" id="gridRadios4">
         <label class="form-check-label" for="gridRadios4">
           الشركات
         </label>
-    </div>
+    </div> --}}
     <div class="form-check m-4">
         <input class="form-check-input areas" type="radio" name="option" value="area" id="gridRadios3">
         <label class="form-check-label" for="gridRadios3">
@@ -68,7 +68,7 @@
 <div class="selected_companies">
     <div class="d-flex flex-column mb-7 fv-row">
         <label class="fs-6 fw-bold mb-2">
-            <span class="required">الشركات</span>
+            <span class="">الشركات</span>
         </label>
         <select name="company_id" aria-label="Select a Country" data-placeholder="اختر الشركه" data-control="select2"  class="form-select  form-select-solid fw-bolder">
             <option value="">اختر الشركه </option>

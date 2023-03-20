@@ -45,6 +45,12 @@ class User extends Authenticatable
     public function shop(){
         return $this->belongsTo(Shop::class,'shop_id');
     }
+    public function seller(){
+        return $this->belongsTo(Seller::class,'seller_id');
+    }
+    public function addedBy(){
+        return $this->belongsTo(Admin::class,'added_by');
+    }
 
     public function add(){
         return $this->belongsTo(Seller::class,'seller_id');

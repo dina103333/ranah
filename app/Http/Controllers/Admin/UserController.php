@@ -48,7 +48,7 @@ class UserController extends Controller
         $image = url('/storage/files/logo.png') ;
         $devices = User::where('id',$request->id)->where('type','اونلاين')->pluck('device_token')->toArray();
         if(count($devices) > 0)
-            dispatch(new SendFCMNotificationJob($devices, $title, $body,$type,$id,$image));
+            dispatch(new SendFCMNotificationJob($devices, $title, $body,$type,$id,null,$image));
     }
 
     /**
@@ -82,6 +82,7 @@ class UserController extends Controller
             'status' => $request->status,
             'type' => 'مباشر',
             'store_id' => $store->id,
+            'change_location' => $request->change_location == "0" ? false : true,
         ]);
 
         $shop = Shop::create([
@@ -113,7 +114,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        return view('admin.users.show', compact('user'));
     }
 
     /**
@@ -152,6 +153,7 @@ class UserController extends Controller
             'status' => $request->status,
             'type' => $user->type,
             'store_id' => $store->id,
+            'change_location' => $request->change_location == "0" ? false : true,
         ]);
         if($request->status == 'حظر')
             $user->update(['active' => 0]);
@@ -163,6 +165,7 @@ class UserController extends Controller
             'shop_types_id' => $request->shop_type_id,
             'area_id' => $request->area_id,
             'store_id' => $store->id,
+
         ]);
         if($request->area_id != $shop->area_id)
         {
@@ -197,5 +200,9 @@ class UserController extends Controller
         User::whereIn('id',explode(",",$ids))->delete();
 
         return response()->json(['status' => true, 'message' => "Records deleted successfully."]);
+    }
+
+    public function deletePoints(Request $request){
+        User::where('id',$request->user_id)->update(['points' => 0]);
     }
 }

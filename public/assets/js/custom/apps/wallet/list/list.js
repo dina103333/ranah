@@ -1,86 +1,4 @@
 var datatable;
-$(document).on('click', '.delete', function (e){
-    Swal.fire({
-            title: 'هل انت متأكد؟',
-            text: "لن تتمكن من التراجع عن هذا!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'نعم احذفها!',
-            cancelButtonText: 'الغاء',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: $(this).data('url'),
-                type: 'POST',
-                data: {
-                    _method : 'DELETE',
-                    _token : $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (res) {
-                    console.log(res)
-                    if (result.value) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم الحذف',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        const parent = e.target.closest('tr');
-                        datatable.row($(parent)).remove().draw();
-                    }
-                }
-            });
-        }
-    })
-});
-function change_status(id){
-    Swal.fire({
-        title: 'هل تريد تغيير حاله العميل ؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'نعم !',
-        cancelButtonText: 'الغاء',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/users-change-status',
-                type: 'get',
-                data: {
-                    _method : 'get',
-                    _token : $('meta[name="csrf-token"]').attr('content'),
-                    id:id
-                },
-                success: function (res) {
-                    if (result.value) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم تغيير حاله العميل',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        datatable.ajax.reload();
-                    }
-                }
-            });
-        }
-    })
-}
-
-function points(points , user_id) {
-    let content = `
-                <h4>اجمالى عدد النقاط : ${points}</h4>
-                <input type="hidden" name="user_id" class="form-control user_id" value="${user_id}" />
-                    `
-    $('.model-points').html(' ');
-    $('.model-points').append(content);
-    $('.points').modal('show');
-
-}
-
 "use strict";
 
 // Class definition
@@ -100,7 +18,7 @@ var KTRolesList = function () {
             const realDate = moment(dateRow[5].innerHTML, "DD MMM YYYY, LT").format(); // select date from 5th column in table
             dateRow[5].setAttribute('data-order', realDate);
         });
-
+        let wallet_id = $('.wallet_id').val();
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
             responsive: false,
@@ -115,77 +33,16 @@ var KTRolesList = function () {
                 className: 'row-selected'
             },
             ajax: {
-                url: '/admin/get-users',
+                url: "/admin/get-user-wallet/"+wallet_id,
             },
             columns: [
-                { data: 'id' },
-                { data: 'name',className: 'text-center'},
-                { data: 'mobile_number' ,className: 'text-center'},
-                { data: 'shop.name',className: 'text-center' },
-                { data: 'shop.area.name' ,className: 'text-center'},
-                { data: 'type',className: 'text-center' },
-                { data: 'status',className: 'text-center' },
-                { data: 'id',className: 'text-center' },
-                { data: 'id' },
-            ],
-            columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    render: function (data) {
-                        return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input checkbox" type="checkbox" data-id="${data}" value="${data}" />
-                            </div>`;
-                    }
-                },
-                {
-                    targets: 7,
-                    orderable: false,
-                    searchable: false,
-                    render: function (data, type, full, meta ) {
-                        let content = `
-                                <div class=" align-items-center text-center">
-
-                                    <button onclick="change_status(${data})" class="btn btn-light" title="تغيير حاله العميل"> `
-                                    if(full.status == 'حظر'){
-                                        content+=`<i class="fa fa-check-circle" style="color:#33d933;"></i>`
-                                    }
-                                    else{
-                                        content+=`<i class="fas fa-times" style="color:red;"></i>`
-                                    }
-                                    content+= `</button>
-                                </div>
-                            `;
-                            return content
-                    }
-                },
-                {
-                    targets: -1,
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: function (data, type, row) {
-                        return `
-                            <div class="d-flex">
-                                <a class="btn" href='/admin/users/${data}' class=" px-3"><i class="fas fa-eye"></i></a>
-                                <a class="btn" href='/admin/users/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
-                            </div>
-                            <div class="d-flex">
-                                <a href="/admin/user-wallet/${data}" class="btn" title="محفظه العميل"> <i class="fas fa-wallet" style="color: red"></i></a>
-                                <button onclick="points(${row.points},${data})" class="btn" title="نقط العميل"><i class="fas fa-hand-point-up" style="color: #acac30;"></i></button>
-                            </div>
-                        `;
-                    },
-                },
+                { data: 'value',className: 'text-center'},
+                { data: 'type' ,className: 'text-center'},
             ],
             // Add data-filter attribute
             createdRow: function (row, data, dataIndex) {
                 $(row).find('td:eq(4)').attr('data-filter', data.CreditCardType);
             }
-
         });
 
         // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
@@ -395,24 +252,6 @@ var KTRolesList = function () {
         // Detect checkboxes state & count
         let checkedState = false;
         let count = 0;
-
-        // Count checked boxes
-        allCheckboxes.forEach(c => {
-            if (c.checked) {
-                checkedState = true;
-                count++;
-            }
-        });
-
-        // Toggle toolbars
-        if (checkedState) {
-            selectedCount.innerHTML = count;
-            toolbarBase.classList.add('d-none');
-            toolbarSelected.classList.remove('d-none');
-        } else {
-            toolbarBase.classList.remove('d-none');
-            toolbarSelected.classList.add('d-none');
-        }
     }
 
     // Public methods
