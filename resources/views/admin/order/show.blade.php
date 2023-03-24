@@ -22,6 +22,12 @@
                     </div>
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end" data-kt-role-table-toolbar="base">
+                            <button onclick="show()" class="btn btn-light me-3 returns">
+                                المرتجعات
+                              </button>
+                            @if(count($order->returns)>0)
+                                <button onclick="dropCustodies({{$order->id}})" type="button" class="btn btn-light me-3">اسقاط عهده السائق</button>
+                            @endif
                             <a href="{{route('admin.print-bill',$order->id)}}" class="btn btn-success btnprn">print</a>
                         </div>
                     </div>
@@ -224,6 +230,41 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="returns-model" role="dialog">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">تفاصبل المرتجعات</h5>
+                </div>
+                <div class="modal-body">
+                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_role_table">
+                        <thead>
+                            <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
+                                <th class="text-center w-80px">المنتج</th>
+                                <th class="text-center w-80px">الكميه المرتجعه جمله</th>
+                                <th class="text-center w-80px">الكميه المرتجعه قطاعى</th>
+                                <th class="text-center w-80px">باجمالى سعر</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-bold text-gray-600">
+                            @foreach ($order->custodies  as $custody)
+                                <tr>
+                                    <td class="text-center">{{$custody->product->name}}</td>
+                                    <td class="text-center">{{$custody->wholesale_quantity}} {{$custody->product->wholesale_type}}</td>
+                                    <td class="text-center">{{$custody->unit_quantity}} {{$custody->product->item_type}}</td>
+                                    <td class="text-center">{{$custody->total}} جنيه</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="hideModele()">اغلاق</button>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -234,6 +275,14 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+
+        function hideModele(){
+            $('#returns-model').modal('hide')
+        }
+        function show() {
+            console.log('ghfrtghtyh');
+            $('#returns-model').modal('show')
+        }
 
         function saveChanges(id){
             wholesale_quantity = [];
@@ -414,6 +463,44 @@
                     })
                 }
             });
+        }
+
+        function dropCustodies(order_id){
+            Swal.fire({
+                    title: 'هل تريج اسقاط العهده من السائق؟',
+                    text: "لن تتمكن من التراجع عن هذا!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'نعم !',
+                    cancelButtonText: 'الغاء',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "/admin/drop-custodies",
+                        type: 'Post',
+                        data: {
+                            _method : 'Post',
+                            _token : '{{ csrf_token() }}',
+                            order_id:order_id,
+                        },
+                        success: function (res) {
+                            if (result.value) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'تم استلام العهده من السائق',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                })
+                                var baseUrl = window.location.origin;
+                                window.location.href =  baseUrl + "/admin/orders/"+order_id;
+                            }
+
+                        }
+                    });
+                }
+            })
         }
 
     </script>

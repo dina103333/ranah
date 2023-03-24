@@ -37,7 +37,11 @@ class Order extends Model
     }
 
     public function returns(){
-        return $this->hasMany(OrderReturn::class);
+        return $this->hasMany(OrderReturn::class ,'order_id');
+    }
+
+    public function custodies(){
+        return $this->hasMany(OrderReturn::class ,'order_id');
     }
 
     public function discounts(){

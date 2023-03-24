@@ -33,7 +33,7 @@
                             <a href="{{route('admin.create-transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">نقل بضاعه</a>
                             <a href="{{route('admin.transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">البضاعه المنقوله للمخزن</a>
                             <a href="#" type="button" class="btn btn-light-primary me-3">الايرادات</a>
-                            <a href="#" type="button" class="btn btn-light-primary me-3">المصروفات</a>
+                            <a href="{{route('admin.index-expenses',$store_id)}}" type="button" class="btn btn-light-primary me-3">المصروفات</a>
                         </div>
                     </div>
                 </div>

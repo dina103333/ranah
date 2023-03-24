@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title') المسؤولين @endsection
+@section('title') الفئات @endsection
 @section('list')
     <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
         <li class="breadcrumb-item text-muted">
@@ -8,7 +8,7 @@
         <li class="breadcrumb-item">
             <span class="bullet bg-gray-200 w-5px h-2px"></span>
         </li>
-        <li class="breadcrumb-item text-muted">اضافه مسؤول</li>
+        <li class="breadcrumb-item text-muted">اضافه فئه</li>
     </ul>
 @endsection
 @section('content')
@@ -19,7 +19,7 @@
                     <form class="form" method="post" action="{{route('admin.categories.store')}}" enctype="multipart/form-data">
                         @include('flash-message')
                         <div class="modal-header" id="kt_modal_add_role_header">
-                            <h2 class="fw-bolder">اضافه مستخدم</h2>
+                            <h2 class="fw-bolder">اضافه فئه</h2>
                         </div>
                         @include('admin.category.form')
                     </form>

@@ -171,6 +171,8 @@ Route::group([
     Route::get('/product-details/{product_id}', [OrderController::class, 'getProductDetails'])->name('product-details');
     Route::post('/deliver-order', [OrderController::class, 'deliveredOrder'])->name('deliver-order');
     Route::post('/direct-discount', [OrderController::class, 'addDirectDiscount'])->name('direct-discount');
+    Route::get('/store-drivers', [OrderController::class, 'storeDrivers'])->name('store-drivers');
+    Route::post('/drop-custodies', [OrderController::class, 'dropCustodies'])->name('drop-custodies');
 
 
     Route::resource('/notifications', NotificationController::class);
@@ -208,5 +210,16 @@ Route::group([
     Route::get('/get-user-wallet/{wallet_id}', [WalletController::class, 'getUserWallet'])->name('get-user-wallet');
     Route::get('/edit-wallet-value/{wallet_id}', [WalletController::class, 'edit'])->name('edit-wallet-value');
     Route::put('/update-wallet-value/{wallet_id}', [WalletController::class, 'update'])->name('update-wallet-value');
+
+
+    Route::resource('/expenses', ExpensesController::class);
+    Route::get('/index/{store_id}', [ExpensesController::class,'index'])->name('index-expenses');
+    Route::get('/create/{store_id}', [ExpensesController::class,'create'])->name('create-expenses');
+
+
+
+
+    Route::get('/unread-notification', [SettingController::class, 'unreadNotifications'])->name('unread-notification');
+    Route::get('/all-notifications', [SettingController::class, 'allNotifications'])->name('all-notifications');
 
 });

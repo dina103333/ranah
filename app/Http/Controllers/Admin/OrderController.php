@@ -5,12 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DriectOrderRequest;
 use App\Jobs\SendFCMNotificationJob;
+use App\Models\Custody;
 use App\Models\Discount;
 use App\Models\DiscountProduct;
 use App\Models\Driver;
 use App\Models\Order;
 use App\Models\OrderDiscount;
 use App\Models\OrderProduct;
+use App\Models\OrderReturn;
 use App\Models\Point;
 use App\Models\Product;
 use App\Models\PromoCode;
@@ -35,15 +37,21 @@ class OrderController extends Controller
      */
     public function index()
     {
+        updateFirebaseNotification('0', '0');
         $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date"),\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')->paginate(10);
-        $drivers = Driver::where('status','تفعيل')->select('id','name')->get();
-        return view('admin.order.index',compact('orders','drivers'));
+        $stores = Store::where('status','تفعيل')->select('id','name')->get();
+        return view('admin.order.index',compact('orders','stores'));
     }
 
     public function getOrders()
     {
         $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date"),\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')->get();
         return datatables($orders)->make(true);
+    }
+
+    public function storeDrivers(Request $request){
+        $drivers = Driver::where('store_id',$request->store_id)->select('id','name','store_id')->get();
+        return $drivers;
     }
 
 
@@ -85,7 +93,11 @@ class OrderController extends Controller
     public function getProductDetails(Request $request,$product_id){
         $product_details = StoreProduct::where('product_id', $product_id)
                                         ->where('store_id', $request->store_id)
-                                        ->join('products','products.id','stores_products.product_id')->first();
+                                        ->join('products','products.id','stores_products.product_id')
+                                        ->where('stores_products.sell_wholesale_price','!=',null)
+                                        ->where('products.status','تفعيل')
+                                        ->where('products.is_available_for_order',true)
+                                        ->first();
         return  response()->json($product_details);
     }
 
@@ -297,16 +309,22 @@ class OrderController extends Controller
      */
     public function show(Request $request,Order $order)
     {
+        updateFirebaseNotification('-','1');
         $order = Order::withSum('discounts','value')->with(['promo'=>function($q){
             $q->withTrashed()->select('id','value');
         },'shop:id,name','user:id,name,mobile_number'
-        ,'store:id,name','products'])->where('id',$order->id)->first();
+        ,'store:id,name','custodies.product','returns'=>function($q){
+            $q->where('status','قيد الانتظار');
+        },'products'])->where(function($q) use($request,$order){
+            if($request->id){
+                $q->where('id',$request->id);
+            }else{
+                $q->where('id',$order->id);
+            }
+        })->first();
         $wallet = Wallet::where('user_id',$order->user_id)->first();
         $status = Order::getEnumValues('orders','status');
         if($request->ajax()){
-            $order = Order::withSum('discounts','value')->with(['promo'=>function($q){
-                $q->withTrashed()->select('id','value');
-            },'shop:id,name','user:id,name','store:id,name','products'])->where('id',$request->id)->first();
             return View('admin.order.table',compact('order','status','wallet'));
         }
         return View('admin.order.show',compact('order','status','wallet'));
@@ -480,5 +498,14 @@ class OrderController extends Controller
 
     public function addDirectDiscount(Request $request){
         Order::where('id',$request->order_id)->update(['discount_price'=>$request->direct_discount]);
+    }
+
+
+
+    public function dropCustodies(Request $request){
+        Custody::where('order_id',$request->order_id)->update([
+            'delivered_from_driver' => true
+        ]);
+        OrderReturn::where('order_id',$request->order_id)->update(['status'=>'تم الاستلام']);
     }
 }

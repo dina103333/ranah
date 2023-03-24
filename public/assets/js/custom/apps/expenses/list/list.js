@@ -1,4 +1,5 @@
 var datatable;
+var store_id = $('.store_id').val();
 $(document).on('click', '.delete', function (e){
     Swal.fire({
             title: 'هل انت متأكد؟',
@@ -35,64 +36,6 @@ $(document).on('click', '.delete', function (e){
         }
     })
 });
-function confirmOrder(id){
-    Swal.fire({
-            title: 'هل تريد تأكيد تسليم منتجات الطلب للمندوب ؟',
-            text: "لن تتمكن من التراجع عن هذا!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'نعم !',
-            cancelButtonText: 'الغاء',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/deliver-order',
-                type: 'POST',
-                data: {
-                    _method : 'POST',
-                    _token : $('meta[name="csrf-token"]').attr('content'),
-                    id:id
-                },
-                success: function (res) {
-                    console.log(res)
-                    if (result.value) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'تم تسليم الطلب للمندوب',
-                            showConfirmButton: false,
-                            timer: 1500
-                        })
-                        datatable.ajax.reload();
-                    }
-                }
-            });
-        }
-    })
-};
-$('.stores').change(function(){
-    let store_id = $('.stores :selected').val();
-    // $('.drivers').empty();
-    $.ajax({
-        url: '/admin/store-drivers',
-        type: 'get',
-        data: {
-            _method : 'get',
-            _token  :  $('meta[name="csrf-token"]').attr('content'),
-            store_id:  store_id
-        },
-        success: function (res) {
-            console.log(res)
-            var content = `` ;
-            $.each(res,function(key , value){
-                content+=`<option value="${value.id}" style="display:none">${value.name}</option>`
-            });
-            console.log(content)
-            $('.drivers').append(content)
-        }
-    });
-});
 "use strict";
 
 // Class definition
@@ -116,7 +59,7 @@ var KTRolesList = function () {
 
         // Init datatable --- more info on datatables: https://datatables.net/manual/
         datatable = $(table).DataTable({
-            responsive: false,
+            responsive: true,
             searchDelay: 500,
             processing: true,
             serverSide: true,
@@ -128,72 +71,25 @@ var KTRolesList = function () {
                 className: 'row-selected'
             },
             ajax: {
-                url: '/admin/get-orders',
+                url: '/admin/get-expenses/'+store_id,
             },
             columns: [
-                { data: 'id',className: 'text-center',width:'80ox' },
-                { data: 'id',className: 'text-center',width:'80ox' },
-                { data: 'status',className: 'text-center',width:'80ox' },
-                { data: 'type',className: 'text-center',width:'80ox' },
-                { data: 'created_date',className: 'text-center',width:'80ox' },
-                { data: 'delivered_date',className: 'text-center',width:'80ox' },
-                { data: 'store.name' ,className: 'text-center',width:'80ox' },
-                { data: 'user.name' ,className: 'text-center',width:'80ox' },
-                { data: 'shop.area.name',className: 'text-center',width:'80ox'  },
-                { data: 'total',className: 'text-center' ,width:'80ox' },
-                { data: 'id' ,className: 'text-center',width:'80ox' },
-                { data: 'id',className: 'text-center' ,width:'80ox' },
+                { data: 'id' },
+                { data: 'propose'},
+                { data: 'price' },
+                { data: 'created_at' },
+                { data: 'id' },
             ],
             columnDefs: [
                 {
                     targets: 0,
                     orderable: false,
                     searchable: false,
-                    render: function (data, type, full) {
-                        if(full.status != 'في الطريق' && full.status != 'تم التسليم' && full.status != 'تم الالغاء'){
-                            return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input name="order_id[]" class="form-check-input order" type="checkbox" value="${data}" />
-                            </div>`;
-                        }else{
-                            return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-
-                            </div>`;
-                        }
-
-                    }
-                },
-                {
-                    targets: 2,
-                    orderable: true,
-                    searchable: true,
                     render: function (data) {
-                        var color = data == 'معلق' ? 'badge-light-warning' :
-                        (data == 'تم الالغاء' ? 'badge-light-danger' : (data == 'في الطريق' ? 'badge-light-info' :
-                        (data == 'تم التسليم' ? 'badge-light-success' : 'badge-light-primary')));
                         return `
-                            <div class="badge ${color} fw-bolder">
-                                ${data}
-                            </div>
-                        `;
-                    }
-                },
-                {
-                    targets: 10,
-                    orderable: true,
-                    searchable: false,
-                    render: function (data,row,full) {
-                        if(full.driver != null){
-                            return `
-                                <span>
-                                    ${full.driver.name}
-                                </span>
-                            `;
-                        }else{
-                            return ` -- `
-                        }
-
+                            <div class="form-check form-check-sm form-check-custom form-check-solid">
+                                <input class="form-check-input" type="checkbox" value="${data}" />
+                            </div>`;
                     }
                 },
                 {
@@ -203,22 +99,12 @@ var KTRolesList = function () {
                     searchable: false,
                     className: 'text-end',
                     render: function (data, type, row) {
-                        var content = `<div class="d-flex">
-                                        <a class="btn" href='/admin/orders/${data}' class=" px-3"><i class="fas fa-eye" style="color: #2cc3c0;"></i></a>`
-                        if(row.driver_id != null){
-                            if(row.delivered_from_store == true)
-                            {
-                                content+= `
-                                        <button disabled class="btn btn-light" title="تم تسليم منتجات الطلب للمندوب" style="width: 50px;"><i class="fa fa-check-circle" style="color:#33d933;"></i></button>
-                                `;
-                            }else{
-                                content+= `
-                                        <button onclick="confirmOrder(${data})" class="btn btn-light" title=" تسليم منتجات الطلب للمندوب" style="width: 50px;"><i class="fa fa-check-circle" style="color:#f4ef10;"></i></button>
-                                `;
-                            }
-                        }
-                        content += `</div>`
-                        return content;
+                        return `
+                            <a class="btn" href='/admin/expenses/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <button  data-url='/admin/expenses/${data}'
+                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                            </button>
+                        `;
                     },
                 },
             ],
@@ -293,8 +179,45 @@ var KTRolesList = function () {
 
                 // Get customer name
                 const customerName = parent.querySelectorAll('td')[1].innerText;
-                $('#exampleModal').modal('show')
 
+                // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
+                Swal.fire({
+                    text: "Are you sure you want to delete " + customerName + "?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Yes, delete!",
+                    cancelButtonText: "No, cancel",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function (result) {
+                    if (result.value) {
+                        Swal.fire({
+                            text: "You have deleted " + customerName + "!.",
+                            icon: "success",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        }).then(function () {
+                            // Remove current row
+                            datatable.row($(parent)).remove().draw();
+                        });
+                    } else if (result.dismiss === 'cancel') {
+                        Swal.fire({
+                            text: customerName + " was not deleted.",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok, got it!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+                });
             })
         });
     }
@@ -338,8 +261,64 @@ var KTRolesList = function () {
 
         // Deleted selected rows
         deleteSelected.addEventListener('click', function () {
-            $('#exampleModal').modal('show')
+            // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
+            Swal.fire({
+                text: "Are you sure you want to delete selected customers?",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "Yes, delete!",
+                cancelButtonText: "No, cancel",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function (result) {
+                if (result.value) {
+                    $.ajax({
+                        url: $(this).data('url'),
+                        type: 'POST',
+                        data: {
+                            _method : 'DELETE',
+                            _token : $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (res) {
+                            Swal.fire({
+                                text: "You have deleted all selected customers!.",
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "Ok, got it!",
+                                customClass: {
+                                    confirmButton: "btn fw-bold btn-primary",
+                                }
+                            }).then(function () {
 
+                                // Remove all selected customers
+                                checkboxes.forEach(c => {
+                                    if (c.checked) {
+                                        datatable.row($(c.closest('tbody tr'))).remove().draw();
+                                    }
+                                });
+
+                                // Remove header checked box
+                                const headerCheckbox = table.querySelectorAll('[type="checkbox"]')[0];
+                                headerCheckbox.checked = false;
+
+
+                            });
+                        }})
+                } else if (result.dismiss === 'cancel') {
+                    Swal.fire({
+                        text: "Selected customers was not deleted.",
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok, got it!",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                        }
+                    });
+                }
+            });
         });
     }
 

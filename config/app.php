@@ -168,7 +168,7 @@ return [
          */
 
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class,
-        
+        Kreait\Laravel\Firebase\ServiceProvider::class,
         /*
          * Application Service Providers...
          */

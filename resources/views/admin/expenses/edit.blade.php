@@ -1,5 +1,5 @@
 @extends('admin.layouts.app')
-@section('title') الفئات @endsection
+@section('title') المصروفات @endsection
 @section('list')
     <ul class="breadcrumb breadcrumb-separatorless fw-bold fs-7 my-1">
         <li class="breadcrumb-item text-muted">
@@ -8,7 +8,7 @@
         <li class="breadcrumb-item">
             <span class="bullet bg-gray-200 w-5px h-2px"></span>
         </li>
-        <li class="breadcrumb-item text-muted">تعديل الفئه</li>
+        <li class="breadcrumb-item text-muted">تعديل المصروفات</li>
     </ul>
 @endsection
 @section('content')
@@ -17,13 +17,13 @@
         <div id="kt_content_container" class="container-xxl">
             <div class="card">
                 <div class="card-body pt-0" style="direction: rtl">
-                    <form class="form" method="post" action="{{route('admin.categories.update',$category)}}" enctype="multipart/form-data">
+                    <form class="form" method="post" action="{{route('admin.expenses.update',$expenses)}}" enctype="multipart/form-data">
                         @method('PUT')
                         @include('flash-message')
                         <div class="modal-header" id="kt_modal_add_role_header">
-                            <h2 class="fw-bolder">تعديل الفئه</h2>
+                            <h2 class="fw-bolder">تعديل المصروفات</h2>
                         </div>
-                        @include('admin.category.form')
+                        @include('admin.expenses.form')
                     </form>
                 </div>
             </div>
@@ -35,7 +35,8 @@
 
 
 @section('js')
-<script src="/assets/js/custom/apps/categories/list/list.js"></script>
 @endsection
+
+
 
 

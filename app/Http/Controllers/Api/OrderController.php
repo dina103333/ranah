@@ -6,6 +6,7 @@ use App\Traits\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\OrderProductResource;
 use App\Http\Resources\Api\OrderResource;
+use App\Models\Admin;
 use App\Models\Cart;
 use App\Models\CartProduct;
 use App\Models\Discount;
@@ -23,14 +24,18 @@ use App\Models\StoreProduct;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletValue;
+use App\Notifications\OrderNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+
 
 class OrderController extends Controller
 {
     use ApiResponse;
 
     public function createOrder(Request $request){
+
         $cart = Cart::with('products')->where('shop_id',$request->user()->shop_id)->first();
         if(!$cart)
             return $this->error('لا يمكنك انشاء طلب والسله فاضيه يا بيه',422);
@@ -57,7 +62,14 @@ class OrderController extends Controller
             $this->addWalletValue($discount,$cart,$wallet);
         }
         $this->addPoints($cart,$request);
+        $this->sendNotification($order,$request);
         return $this->addOrderProducts($order,$cart,$store,$wallet,$request);
+    }
+
+    function sendNotification($order,$request){
+        updateFirebaseNotification('+', '1');
+        $message = 'باضافه طلب جديد'.' '.$request->user()->name.' لقد قام ';
+        addFirebaseNotification($order->id,$message);
     }
 
     function addWalletValue($discount,$cart,$wallet){

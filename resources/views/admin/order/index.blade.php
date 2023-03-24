@@ -82,12 +82,18 @@
                 </button>
                 </div>
                 <div class="modal-body">
-                    <select name="driver_id" aria-label="Select a Country" data-placeholder="اختر السائق" data-control="select2"  class="driver form-select form-select-solid fw-bolder">
-                        <option value="">اختر السائق </option>
-                        @foreach ($drivers as $driver)
-                            <option value="{{$driver->id}}">{{$driver->name}}</option>
-                        @endforeach
-                    </select>
+                    <div class="fv-row mb-7">
+                        <select name="store_id" data-placeholder="اختر المخزن" data-control="select2"  class="form-select form-select-solid fw-bolder stores">
+                            <option value="">اختر المخزن </option>
+                            @foreach ($stores as $store)
+                                <option value="{{$store->id}}">{{$store->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="fv-row mb-7">
+                        <select name="driver_id" aria-label="Select a Country" data-placeholder="اختر السائق" data-control="select2"  class="form-select form-select-solid fw-bolder drivers">
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button onclick="hideModele()" type="button" class="btn btn-secondary" data-dismiss="modal">اغلاق</button>
@@ -112,7 +118,7 @@
         }
 
         function saveDriver(){
-            var driver_id =$('.driver').val()
+            var driver_id =$('.drivers :selected').val()
             var arr = [];
             var i = 0;
             $('.order:checked').each(function () {
@@ -140,6 +146,8 @@
                 }
             });
         }
+
+
 
     </script>
 @endsection

@@ -15,7 +15,7 @@ class AuthenticateApi extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            abort(response()->json(['message'=>'ya asta don\'t small us give me the token'],403));
+            abort(response()->json(['message'=>'برجاء التسجيل واعاده المحاوله'],403));
         }
     }
 }

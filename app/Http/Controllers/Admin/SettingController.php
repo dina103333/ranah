@@ -60,4 +60,11 @@ class SettingController extends Controller
         }
         return redirect()->route('admin.edit-setting');
    }
+
+   public function unreadNotifications(){
+        return unreadedNotfication();
+   }
+   public function allNotifications(){
+        return allnotifications();
+   }
 }

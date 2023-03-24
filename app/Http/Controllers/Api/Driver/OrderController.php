@@ -161,7 +161,7 @@ class OrderController extends Controller
 
     public function deliverCustody(Request $request){
         Custody::where('driver_id',$request->user()->id)->update(['delivered_to_store'=>true]);
-         OrderReturn::where('driver_id',$request->user()->id)->update(['status'=>'تم الاستلام']);
+         OrderReturn::where('driver_id',$request->user()->id)->update(['delivered_from_driver'=>true]);
         return $this->successSingle('تم اسقاط العهده بنجاح من جانب السائق',[],200);
     }
 

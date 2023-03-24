@@ -39,7 +39,7 @@ class ProductController extends Controller
         },'stores'=>function($q) use($store){
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
-        }])->paginate(6);
+        }])->where('products.status','تفعيل')->paginate(6);
         return  $this->successSingle('تم بنجاح',ProductResource::collection($products)->response()->getData(true),200);
 
     }
@@ -67,8 +67,12 @@ class ProductController extends Controller
             $q->where('stores_products.store_id',$store->id)
             ->where('stores_products.sell_wholesale_price','!=',null);
         },'carts'=>function($q) use($request){
-            $q->where('carts.shop_id',$request->user()->shop_i);
+            if($request->user()){
+                $q->where('carts.shop_id',$request->user()->shop_id);
+            }
         }])->first();
+        $auth = $request->user() ? true : false;
+        $products->append('auth',$auth);
         if($products){
             return $this->successSingle('تم بنجاح',ShowProductResource::make($products),200);
         }else{

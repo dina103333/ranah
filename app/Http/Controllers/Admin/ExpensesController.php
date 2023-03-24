@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expenses;
+use Facade\FlareClient\View;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Exporter;
 
 class ExpensesController extends Controller
 {
@@ -13,9 +15,15 @@ class ExpensesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($store_id)
     {
-        // $expenses = Expenses::
+        $expenses = Expenses::where('store_id',$store_id)->orderBy('id','desc')->paginate(10);
+        return view('admin.expenses.index',compact('expenses','store_id'));
+    }
+
+    public function getExpenses($store_id){
+        $expenses = Expenses::where('store_id',$store_id)->orderBy('id','desc')->get();
+        return datatables($expenses)->make(true);
     }
 
     /**
@@ -23,9 +31,9 @@ class ExpensesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($store_id)
     {
-        //
+        return View('admin.expenses.create',compact('store_id'));
     }
 
     /**
@@ -36,7 +44,8 @@ class ExpensesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Expenses::create($request->all());
+        // return
     }
 
     /**
@@ -58,7 +67,7 @@ class ExpensesController extends Controller
      */
     public function edit(Expenses $expenses)
     {
-        //
+        return View('admin.expenses.edit',compact('expenses'));
     }
 
     /**
@@ -70,7 +79,7 @@ class ExpensesController extends Controller
      */
     public function update(Request $request, Expenses $expenses)
     {
-        //
+        $expenses->update($request->all());
     }
 
     /**
