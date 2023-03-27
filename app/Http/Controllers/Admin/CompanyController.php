@@ -19,6 +19,9 @@ class CompanyController extends Controller
      */
     public function index()
     {
+        if(!in_array(10,permissions())){
+            abort(403);
+        }
         $companies = Company::paginate(10);
         return view('admin.company.index',compact('companies'));
     }
@@ -35,6 +38,9 @@ class CompanyController extends Controller
      */
     public function create()
     {
+        if(!in_array(9,permissions())){
+            abort(403);
+        }
         $categories = Category::where('parent_id','!=',null)->get();
         $status = Company::getEnumValues('companies','status');
         return view('admin.company.create',compact('categories','status'));
@@ -48,11 +54,11 @@ class CompanyController extends Controller
      */
     public function store(CompanyRequest $request)
     {
-        $file = $request->file('image')->store('public/files');
+        $file = $request->file('image')->store('public/files/companies');
         $filepath=explode('/',$file);
         $company = Company::create([
             'name'      =>$request->name,
-            'image'     =>$filepath[1].'/'.$filepath[2],
+            'image'     =>$filepath[1].'/'.$filepath[2].'/'.$filepath[3],
             'status'    =>$request->status,
         ]);
         foreach($request->categories as $category){
@@ -83,6 +89,9 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
+        if(!in_array(11,permissions())){
+            abort(403);
+        }
         $categories = Category::where('parent_id','!=',null)->get();
         $status = Company::getEnumValues('companies','status');
         $company_categories = CompanyCategory::where('company_id',$company->id)->pluck('category_id')->toArray();
@@ -100,12 +109,12 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company)
     {
         if($request->file('image')){
-            $file = $request->file('image')->store('public/files');
+            $file = $request->file('image')->store('public/files/companies');
             $filepath=explode('/',$file);
         }
         $company->update([
             'name'      =>$request->name,
-            'image'     =>$request->file('image') ? $filepath[1].'/'.$filepath[2] : $company->image ,
+            'image'     =>$request->file('image') ? $filepath[1].'/'.$filepath[2].'/'.$filepath[3] : $company->image ,
             'status'    =>$request->status,
         ]);
         CompanyCategory::where('company_id',$company->id)->delete();
@@ -126,6 +135,9 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
+        if(!in_array(12,permissions())){
+            abort(403);
+        }
         Product::where('company_id',$company->id)->delete();
         CompanyCategory::where('company_id',$company->id)->delete();
         $company->delete();

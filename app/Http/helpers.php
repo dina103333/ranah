@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PermissionUser;
 use Illuminate\Support\Facades\Cache;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\ServiceAccount;
@@ -97,7 +98,7 @@ function unreadedNotfication()
 {
     $database = app('firebase.database');
     $notifications = $database->getReference("notifications")->orderByChild('read')->getSnapshot()->getValue();
-    $unreadNotifications = $notifications[1];
+    $unreadNotifications = $notifications ? $notifications[1] : 0;
     return $unreadNotifications;
 }
 
@@ -107,3 +108,9 @@ function allnotifications(){
     $notifications = $database->getReference("notifications")->orderByChild('read')->getSnapshot()->getValue();
     return $notifications;
 }
+
+function permissions(){
+    return PermissionUser::where('admin_id',auth()->user()->id)->pluck('permission_id')->toArray();
+}
+
+

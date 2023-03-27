@@ -24,6 +24,9 @@ class UserController extends Controller
      */
     public function index()
     {
+        if(!in_array(99,permissions())){
+            abort(403);
+        }
         $users = User::with('add','shop.area','shop.type')->where('status','!=','جديد')->paginate('10');
         return view('admin.users.index', compact('users'));
     }
@@ -58,6 +61,9 @@ class UserController extends Controller
      */
     public function create()
     {
+        if(!in_array(98,permissions())){
+            abort(403);
+        }
         $shop_types = ShopType::where('status','تفعيل')->select('id','name')->get();
         $areas = Area::where('status','تفعيل')->select('id','name')->get();
         $status = User::getEnumValues('users','status');
@@ -72,7 +78,8 @@ class UserController extends Controller
      */
     public function store(UserRequest $request)
     {
-        $store = Store::where('area_id',$request->area_id)->first();
+        $area = Area::find($request->area_id);
+        $store = Store::where('id',$area->store_id)->first();
         if(!$store)
             return redirect()->back()->with('error','لا يمكن انشاء عميل على هذه المنطقه لعدم توافر مخزن فيها');
         $user = User::create([
@@ -92,6 +99,8 @@ class UserController extends Controller
             'shop_types_id' => $request->shop_type_id,
             'area_id' => $request->area_id,
             'store_id' => $store->id,
+            'longitude' => $request->longitude,
+            'latitude' => $request->latitude,
         ]);
         $user->update(['shop_id'=>$shop->id]);
 
@@ -125,6 +134,9 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        if(!in_array(100,permissions())){
+            abort(403);
+        }
         $user = User::where('id',$user->id)->with(['shop'=>function($q)use($user){
             $q->where('id',$user->shop_id);
         }])->first();
@@ -143,7 +155,9 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
-        $store = Store::where('area_id',$request->area_id)->first();
+
+        $area = Area::find($request->area_id);
+        $store = Store::where('id',$area->store_id)->first();
         if(!$store)
             return redirect()->back()->with('error','لا يمكن انشاء عميل على هذه المنطقه لعدم توافر مخزن فيها');
         $user->update([
@@ -165,7 +179,8 @@ class UserController extends Controller
             'shop_types_id' => $request->shop_type_id,
             'area_id' => $request->area_id,
             'store_id' => $store->id,
-
+            'longitude' => $request->longitude,
+            'latitude' => $request->latitude,
         ]);
         if($request->area_id != $shop->area_id)
         {
@@ -189,11 +204,17 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if(!in_array(101,permissions())){
+            abort(403);
+        }
         $user->delete();
     }
 
     public function multiUsersDelete(Request $request)
     {
+        if(!in_array(101,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         Complaint::whereIn('user_id',explode(",",$ids))->delete();
         NotifyUser::whereIn('user_id',explode(",",$ids))->delete();

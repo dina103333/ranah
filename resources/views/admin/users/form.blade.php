@@ -58,6 +58,22 @@
         <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('address') }}</span>
     @endif
 
+    <div class="fv-row mb-7">
+        <label class="required fs-6 fw-bold mb-2">خطوط الطول</label>
+        <input type="text" class="form-control form-control-solid" placeholder="" name="longitude" value="{{isset($user) ? $user->shop->longitude :' '}}" />
+    </div>
+    @if ($errors->has('longitude'))
+        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('longitude') }}</span>
+    @endif
+
+    <div class="fv-row mb-7">
+        <label class="required fs-6 fw-bold mb-2">دوائر العرض</label>
+        <input type="text" class="form-control form-control-solid" placeholder="" name="latitude" value="{{isset($user) ?$user->shop->latitude :' '}}" />
+    </div>
+    @if ($errors->has('latitude'))
+        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('latitude') }}</span>
+    @endif
+
     <div id="kt_modal_add_customer_billing_info" class="collapse show">
         <div class="d-flex flex-column mb-7 fv-row">
             <label class="fs-6 fw-bold mb-2">

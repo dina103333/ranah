@@ -17,6 +17,9 @@ class PromoCodeController extends Controller
      */
     public function index()
     {
+        if(!in_array(119,permissions())){
+            abort(403);
+        }
         $promos = PromoCode::orderBy('id','desc')->paginate(10);
         return view('admin.promo.index',compact('promos'));
     }
@@ -32,6 +35,9 @@ class PromoCodeController extends Controller
      */
     public function create()
     {
+        if(!in_array(120,permissions())){
+            abort(403);
+        }
         $status = PromoCode::getEnumValues('promo_code','status');
         return view('admin.promo.create',compact('status'));
     }
@@ -71,6 +77,9 @@ class PromoCodeController extends Controller
      */
     public function edit(PromoCode $promo)
     {
+        if(!in_array(121,permissions())){
+            abort(403);
+        }
         $status = PromoCode::getEnumValues('promo_code','status');
         return view('admin.promo.edit',compact('status','promo'));
     }
@@ -100,11 +109,17 @@ class PromoCodeController extends Controller
      */
     public function destroy(PromoCode $promo)
     {
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         $promo->delete();
     }
 
     public function multiPromoDelete(Request $request)
     {
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         PromoCode::whereIn('id',explode(",",$ids))->delete();
         return response()->json(['status' => true, 'message' => "Records deleted successfully."]);

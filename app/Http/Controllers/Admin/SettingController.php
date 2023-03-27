@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 class SettingController extends Controller
 {
    public function edit(){
+        if(!in_array(191,permissions())){
+            abort(403);
+        }
         $setting=Setting::get();
         return view('admin.setting.edit',compact('setting'));
    }
@@ -61,6 +64,9 @@ class SettingController extends Controller
         return redirect()->route('admin.edit-setting');
    }
 
+   public function userPermissions(){
+        return permissions();
+   }
    public function unreadNotifications(){
         return unreadedNotfication();
    }

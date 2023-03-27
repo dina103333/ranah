@@ -13,13 +13,16 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::with('subCategory')->paginate('10');
+        if(!in_array(6,permissions())){
+            abort(403);
+        }
+        $categories = Category::where('parent_id',null)->paginate('10');
         return view('admin.category.index',compact('categories'));
     }
 
     public function getCategories()
     {
-        $categories = Category::with('subCategory');
+        $categories = Category::where('parent_id',null);
         return datatables($categories)->make(true);
     }
 
@@ -30,9 +33,11 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        $sub_categories = Category::where('parent_id',null)->get();
+        if(!in_array(5,permissions())){
+            abort(403);
+        }
         $status = Category::getEnumValues('categories','status');
-        return view('admin.category.create',compact('sub_categories','status'));
+        return view('admin.category.create',compact('status'));
     }
 
     /**
@@ -43,13 +48,12 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        $file = $request->file('image')->store('public/files');
+        $file = $request->file('image')->store('public/files/categories');
         $filepath=explode('/',$file);
         Category::create([
             'name'      =>$request->name,
-            'image'     =>$filepath[1].'/'.$filepath[2],
+            'image'     =>$filepath[1].'/'.$filepath[2].'/'.$filepath[3],
             'status'    =>$request->status,
-            'parent_id' =>$request->parent_id == 0 ? null : $request->parent_id,
         ]);
         return redirect(route('admin.categories.index'))->with('success','تم اضافه فئه بنجاح');
     }
@@ -73,9 +77,11 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
+        if(!in_array(7,permissions())){
+            abort(403);
+        }
         $status = Category::getEnumValues('categories','status');
-        $sub_categories = Category::where('parent_id',null)->where('id','!=',$category->id)->get();
-        return view('admin.category.edit',compact('status','sub_categories','category'));
+        return view('admin.category.edit',compact('status','category'));
     }
 
     /**
@@ -88,14 +94,13 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         if($request->file('image')){
-            $file = $request->file('image')->store('public/files');
+            $file = $request->file('image')->store('public/files/categories');
             $filepath=explode('/',$file);
         }
         $category->update([
             'name'      =>$request->name,
-            'image'     =>$request->file('image') ? $filepath[1].'/'.$filepath[2] : $category->image ,
+            'image'     =>$request->file('image') ? $filepath[1].'/'.$filepath[2].'/'.$filepath[3] : $category->image ,
             'status'    =>$request->status,
-            'parent_id' =>$request->parent_id,
         ]);
         return redirect(route('admin.categories.index'))->with('success','تم تعديل فئه بنجاح');
     }
@@ -108,6 +113,9 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
+        if(!in_array(8,permissions())){
+            abort(403);
+        }
         Product::where('category_id',$category->id)->delete();
         CompanyCategory::where('category_id',$category->id)->delete();
         Category::where('parent_id',$category->id)->delete();

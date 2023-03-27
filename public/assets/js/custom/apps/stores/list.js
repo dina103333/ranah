@@ -75,9 +75,6 @@ var KTRolesList = function () {
             columns: [
                 { data: 'id' },
                 { data: 'name' },
-                { data: 'keeper.name' },
-                { data: 'finance_manager.name' },
-                { data: 'area.name' },
                 { data: 'id' },
                 { data: 'status' },
                 { data: 'id' },
@@ -95,7 +92,7 @@ var KTRolesList = function () {
                     }
                 },
                 {
-                    targets: 5,
+                    targets: 2,
                     orderable: false,
                     searchable: false,
                     render: function (data,row,full) {
@@ -116,8 +113,8 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/get-store-products/${data}' class=" px-3"><i class="fab fa-product-hunt"></i></a>
-                            <a class="btn" href='/admin/stores/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class="btn show-product" href='/admin/get-store-products/${data}' class=" px-3"><i class="fab fa-product-hunt"></i></a>
+                            <a class="btn edit" href='/admin/stores/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/stores/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                             </button>

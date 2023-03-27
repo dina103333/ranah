@@ -14,7 +14,7 @@
     @if ($errors->has('price'))
         <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('price') }}</span>
     @endif
-    <input type="hidden" name="store_id" value="{{$store_id}}"/>
+    <input type="hidden" name="store_id" value="{{isset($expenses) ? $expenses->store_id :$store_id}}"/>
 
 </div>
 <div class="modal-footer flex-center">

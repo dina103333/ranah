@@ -153,7 +153,7 @@ var KTRolesList = function () {
                         if(row.is_received == false){
                             content= `
                                 <div class="d-flex">
-                                    <a class="btn" href='/admin/receipts/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                                    <a class="btn edit" href='/admin/receipts/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                                     <button  data-url='/admin/receipts/${data}'
                                         class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                                     </button>

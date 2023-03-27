@@ -98,7 +98,7 @@ var KTCustomersList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/areas/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class="btn edit" href='/admin/areas/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/areas/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                             </button>

@@ -30,16 +30,6 @@
             </div>
             <div class="d-flex align-items-stretch flex-shrink-0">
                 <div class="topbar d-flex align-items-stretch flex-shrink-0">
-                    {{-- Chat --}}
-                    <div class="d-flex align-items-stretch">
-                        <!--begin::Menu wrapper-->
-                        <div class="topbar-item position-relative px-3 px-lg-5" id="kt_drawer_chat_toggle">
-                            <i class="bi bi-chat-left-text fs-3"></i>
-                            <span
-                                class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 mt-4 start-50 animation-blink"></span>
-                        </div>
-                        <!--end::Menu wrapper-->
-                    </div>
                     {{-- Notifications --}}
                     <div class="d-flex align-items-stretch">
                         <div class="topbar-item position-relative px-3 px-lg-5" data-kt-menu-trigger="click"
@@ -62,7 +52,9 @@
                             <div class="tab-content">
                                 <div class="tab-pane show active" id="kt_topbar_notifications_1" role="tabpanel">
                                     <div class="scroll-y mh-325px my-5 px-8 nav-all-notifications">
-                                        <?php $notifications = allnotifications() ; ?>
+                                        <?php
+                                            $notifications = allnotifications() ;
+                                        ?>
                                         @if (!empty($notifications))
                                             @foreach (array_reverse($notifications) as $notificationId => $notificationData)
                                                 @if(is_array($notificationData) && isset($notificationData["message"]))
@@ -132,13 +124,16 @@
                             <div class="separator my-2"></div>
 
                             <div class="menu-item px-5">
-                                <a href="../../demo13/dist/account/overview.html" class="menu-link px-5">الملف الشخصى</a>
+                                <a href="{{route('admin.edit-admin')}}" class="menu-link px-5">الملف الشخصى</a>
                             </div>
                             <div class="separator my-2"></div>
-                            <div class="menu-item px-5 my-1">
-                                <a href="{{route('admin.edit-setting')}}" class="menu-link px-5">
-                                    الاعدادات</a>
-                            </div>
+
+                            @if(in_array(191,permissions()))
+                                <div class="menu-item px-5 my-1">
+                                    <a href="{{route('admin.edit-setting')}}" class="menu-link px-5">
+                                        الاعدادات</a>
+                                </div>
+                            @endif
                             <div class="menu-item px-5">
                                 <a href="{{route('admin.logout')}}"
                                     class="menu-link px-5">تسجيل الخروج</a>

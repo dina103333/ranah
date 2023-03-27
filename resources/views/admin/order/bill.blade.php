@@ -53,10 +53,9 @@
                                 </thead>
                                 <tbody>
                                     <tr >
-                                        <td colspan="3" style="text-align: center" >01223526165</td>
-                                        <td colspan="3" style="text-align: center" ></td>
-                                        <td colspan="3" style="text-align: center" ></td>
-                                        <td colspan="3" style="text-align: center" ></td>
+                                        @foreach ($contact_numbers as $number)
+                                            <td colspan="3" style="text-align: center" >{{$number->mobile_number}}</td>
+                                        @endforeach
                                     </tr>
                                     <tr>
                                         <td style="text-align: end;" colspan="4">{{$order->store->name}}</td>
@@ -75,8 +74,6 @@
                                     </tr>
                                     <tr>
                                         <td  style="text-align: end;">{{$order->shop->area->name}}</td>
-                                        <!--<td style="text-align: end;" > منطقة العميل</td>-->
-
                                         <td colspan="8" style="text-align: end;">{{$order->shop->address}}</td>
                                         <td style="text-align: end;" >عنوان العميل</td>
                                     </tr>

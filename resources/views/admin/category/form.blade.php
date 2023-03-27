@@ -1,24 +1,5 @@
 @csrf
 <div class="modal-body py-10 px-lg-17" >
-    <div id="kt_modal_add_customer_billing_info" class="collapse show">
-        <div class="d-flex flex-column mb-7 fv-row">
-            <label class="fs-6 fw-bold mb-2">
-                <span class="required">الفئه</span>
-            </label>
-            <select name="parent_id" aria-label="Select a Country" data-placeholder=" اختر الفئه الرئيسيه" data-control="select2"  class="form-select form-select-solid fw-bolder">
-                <option value="">اختر الفئه الرئيسيه</option>
-                <option value="0"> فئه رئيسيه</option>
-                @foreach ($sub_categories as $sub_category)
-                    <option value="{{$sub_category->id}}" {{isset($category) ?( $sub_category->id == $category->parent_id ?'selected' : '') : ''}}>{{$sub_category->name}}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-    @if ($errors->has('parent_id'))
-        <span style="color: red;margin-bottom: 17px;display: block;">{{ $errors->first('parent_id') }}</span>
-    @endif
-
-
     <div class="fv-row mb-7">
         <label class="required fs-6 fw-bold mb-2">اسم الفئه</label>
         <input type="text" class="form-control form-control-solid" placeholder="" name="name" value="{{isset($category) ?$category->name :old('name')}}" />

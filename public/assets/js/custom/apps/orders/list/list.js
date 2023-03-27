@@ -204,7 +204,7 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         var content = `<div class="d-flex">
-                                        <a class="btn" href='/admin/orders/${data}' class=" px-3"><i class="fas fa-eye" style="color: #2cc3c0;"></i></a>`
+                                        <a class="btn show" href='/admin/orders/${data}' class=" px-3"><i class="fas fa-eye" style="color: #2cc3c0;"></i></a>`
                         if(row.driver_id != null){
                             if(row.delivered_from_store == true)
                             {
@@ -213,7 +213,7 @@ var KTRolesList = function () {
                                 `;
                             }else{
                                 content+= `
-                                        <button onclick="confirmOrder(${data})" class="btn btn-light" title=" تسليم منتجات الطلب للمندوب" style="width: 50px;"><i class="fa fa-check-circle" style="color:#f4ef10;"></i></button>
+                                        <button onclick="confirmOrder(${data})" class="btn btn-light deliver" title=" تسليم منتجات الطلب للمندوب" style="width: 50px;"><i class="fa fa-check-circle" style="color:#f4ef10;"></i></button>
                                 `;
                             }
                         }

@@ -150,13 +150,13 @@ var KTRolesList = function () {
                     searchable: false,
                     className: 'text-center',
                     render: function (data,row,full) {
-
-                        return `
-                            <button class="btn" onClick="show_modal(${data})" class=" px-3"><i class="fas fa-eye"></i></button>
-                            <button onClick="change_status(${data})"
-                                class="btn btn-light"><i class="fa fa-check-circle" style="color:#33d933;"></i>
-                            </button>
-                        `;
+                        let content = `<button class="btn" onClick="show_modal(${data})" class=" px-3"><i class="fas fa-eye"></i></button>`
+                        if(full.arrived_to_store == false){
+                            content =+ `<button onClick="change_status(${data})"
+                            class="btn btn-light"><i class="fa fa-check-circle" style="color:#33d933;"></i>
+                        </button>`
+                        }
+                        return content;
                     },
                 },
             ],

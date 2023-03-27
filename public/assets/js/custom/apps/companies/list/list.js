@@ -111,10 +111,11 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/companies/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class="btn edit" href='/admin/companies/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/companies/${data}'
                                 class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                             </button>
+                            <a class="btn btn-light" href='http://newranah.rana7.com/?id=${data}&title=${row.name}&type=company' class=" px-3"> رابط التطبيق</a>
                         `;
                     },
                 },

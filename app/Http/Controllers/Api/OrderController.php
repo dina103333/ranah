@@ -50,6 +50,7 @@ class OrderController extends Controller
             'store_id'      => $cart->store_id,
             'sub_total'     => $cart->sub_total,
             'total'         => 0,
+            'total_cost'    => 0,
             'distance'      => (Double) number_format($distance),
             'fee'           => Setting::where('key','سعر الشحن للكيلو الواحد')->first()->value,
             'status'        => 'معلق',
@@ -62,7 +63,7 @@ class OrderController extends Controller
             $this->addWalletValue($discount,$cart,$wallet);
         }
         $this->addPoints($cart,$request);
-        $this->sendNotification($order,$request);
+        // $this->sendNotification($order,$request);
         return $this->addOrderProducts($order,$cart,$store,$wallet,$request);
     }
 
@@ -100,6 +101,7 @@ class OrderController extends Controller
 
     public function addOrderProducts($order,$cart,$store,$wallet,$request){
         $total = [];
+        $cost_total = [];
         foreach($cart->products as $product){
             $store_product = StoreProduct::where('product_id',$product->id)->where('store_id',$store->id)->first();
             if($store_product->max_limit !=0 ){
@@ -120,12 +122,16 @@ class OrderController extends Controller
                 'unit_price'                     => $product->pivot->unit_price,
                 'wholesale_price'                => $product->pivot->wholesale_price,
                 'total'                          => $product->pivot->unit_total + $product->pivot->wholesale_total  ,
+                'unit_buy_price'                 => $store_product->buy_price / $product->wholesale_quantity_units ,
+                'wholesale_buy_price'            => $store_product->buy_price ,
+                'total_cost'                     => ($store_product->buy_price * $product->pivot->wholesale_quantity) + (($store_product->buy_price / $product->wholesale_quantity_units) * $product->pivot->unit_quantity),
             ]);
             $this->addDiscountProduct($product , $order, $request,$wallet,$products);
             $total[] = $products->total - ($products->item_discount + $products->wholesale_discount);
+            $cost_total[] = $products->total_cost;
             $this->updateStoreQuantity($product , $store_product);
         }
-        $this->updateOrderTotal($total,$wallet,$order);
+        $this->updateOrderTotal($total,$wallet,$order,$cost_total);
         $this->removeCart($cart);
         return $this->successSingle('تم انشاء الطلب بنجاح',[],200);
     }
@@ -134,7 +140,7 @@ class OrderController extends Controller
         if($product->pivot->wholesale_quantity != 0 ){
             $store_product->update([
                 'wholesale_quantity' => $store_product->wholesale_quantity - $product->pivot->wholesale_quantity,
-                'unit_quantity' =>  $store_product->unit_quantity - ($product->pivot->wholesale_quantity * $product->wholesale_quantity_units),
+                'unit_quantity' =>  $store_product->unit_quantity - (($product->pivot->wholesale_quantity * $product->wholesale_quantity_units)+ $product->pivot->unit_quantity),
             ]);
         }else{
             $store_product->update([
@@ -182,9 +188,10 @@ class OrderController extends Controller
 
     }
 
-    function updateOrderTotal($total,$wallet,$order){
+    function updateOrderTotal($total,$wallet,$order,$cost_total){
         $order_total = (array_sum($total) + ($order->fee * $order->distance)) > $wallet->value ?  (array_sum($total) + ($order->fee * $order->distance)) - $wallet->value : 0;
-        $order->update(['total' => $order_total]);
+        $order->update(['total' => $order_total ,'total_cost'=>array_sum($cost_total)]);
+
         if((array_sum($total) + ($order->fee * $order->distance)) > $wallet->value ){
             $wallet->update(['value' => 0]);
             WalletValue::create([

@@ -7,6 +7,7 @@ use App\Http\Requests\Api\LoginRequest;
 use App\Http\Requests\Api\RegisterRequest;
 use App\Http\Resources\Api\UserLoginResource;
 use App\Jobs\SendOtp;
+use App\Models\Area;
 use App\Models\Setting;
 use App\Models\Shop;
 use App\Models\Store;
@@ -30,9 +31,11 @@ class LoginController extends Controller
             'mobile_number' => $request->mobile_number ,
             'password' => Hash::make($request->password),
             'device_token'=>$request->device_token,
-            'status' => 'جديد'
+            'status' => 'جديد',
+            'seller_id' => $request->device_token ? $request->device_token : null,
         ]);
-        $store = Store::where('area_id',$request->area_id)->select('id')->first();
+        $area = Area::find($request->area_id);
+        $store = Store::where('id',$area->store_id)->first();
         $file= Storage::disk('public')->put('shop'.$user->id , $request->file('image'));
         $shop = Shop::create([
             'user_id' => $user->id,
@@ -93,7 +96,8 @@ class LoginController extends Controller
         if(json_decode($result->body())->type == 'success'){
             return $this->successSingle('تم  ارسال رمز التحقق بنجاح ',[], 200);
         }else{
-            return $this->error('لم يتم ارسال رمز التحقق برجاء مراجعه رقم الهاتف',501);
+            return $this->error(json_decode($result->body()),501);
+            // return $this->error('لم يتم ارسال رمز التحقق برجاء مراجعه رقم الهاتف',501);
         }
     }
 

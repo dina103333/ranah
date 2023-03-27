@@ -16,6 +16,9 @@ class PointController extends Controller
      */
     public function index()
     {
+        if(!in_array(119,permissions())){
+            abort(403);
+        }
         $points =Point::paginate(10);
         return view('admin.point.index',compact('points'));
     }
@@ -32,6 +35,9 @@ class PointController extends Controller
      */
     public function create()
     {
+        if(!in_array(120,permissions())){
+            abort(403);
+        }
         $status = Point::getEnumValues('points','status');
         return view('admin.point.create',compact('status'));
     }
@@ -73,6 +79,9 @@ class PointController extends Controller
      */
     public function edit(Point $point)
     {
+        if(!in_array(121,permissions())){
+            abort(403);
+        }
         $status = Point::getEnumValues('points','status');
         return view('admin.point.edit',compact('point','status'));
     }
@@ -104,6 +113,9 @@ class PointController extends Controller
      */
     public function destroy(Point $point)
     {
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         $point->delete();
     }
 }

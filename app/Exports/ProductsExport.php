@@ -14,19 +14,25 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings
     */
     public function collection()
     {
-        return Product::all();
+        return Product::with('company','category')->get();
     }
 
     public function map($product): array
     {
         return [
+            $product->id,
             $product->name,
+            $product->company->name,
             $product->category->name,
+            $product->selling_type,
+            $product->wholesale_type,
+            $product->item_type,
+            $product->wholesale_quantity_units,
         ];
     }
 
     public function headings(): array
     {
-        return ["Name", "Category Name"];
+        return ["#","االمنتج", "الشركه","الفئه","طريقه البيع","الجمله","القطاعى","عدد الوحدات فى الجمله"];
     }
 }

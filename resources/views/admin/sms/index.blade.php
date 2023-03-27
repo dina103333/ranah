@@ -69,6 +69,19 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+        $(document).ready(function(event) {
+            $.ajax({
+                type: 'get',
+                url: '/admin/user-permission',
+                success: function(response) {
+                    if ($.inArray(55, response) !== -1) {
+                        $('.delete').show();
+                    } else {
+                        $('.delete').hide();
+                    }
+                }
+            });
+        });
     </script>
 @endsection
 

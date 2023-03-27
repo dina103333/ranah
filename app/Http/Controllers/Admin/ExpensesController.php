@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ExpensesRequest;
 use App\Models\Expenses;
+use App\Models\Treasury;
 use Facade\FlareClient\View;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Exporter;
@@ -17,12 +19,16 @@ class ExpensesController extends Controller
      */
     public function index($store_id)
     {
+        if(!in_array(160,permissions())){
+            abort(403);
+        }
         $expenses = Expenses::where('store_id',$store_id)->orderBy('id','desc')->paginate(10);
-        return view('admin.expenses.index',compact('expenses','store_id'));
+        $total = $expenses->sum('price');
+        return view('admin.expenses.index',compact('expenses','store_id','total'));
     }
 
     public function getExpenses($store_id){
-        $expenses = Expenses::where('store_id',$store_id)->orderBy('id','desc')->get();
+        $expenses = Expenses::where('store_id',$store_id)->orderBy('id','desc');
         return datatables($expenses)->make(true);
     }
 
@@ -33,6 +39,9 @@ class ExpensesController extends Controller
      */
     public function create($store_id)
     {
+        if(!in_array(135,permissions())){
+            abort(403);
+        }
         return View('admin.expenses.create',compact('store_id'));
     }
 
@@ -42,21 +51,15 @@ class ExpensesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ExpensesRequest $request)
     {
-        Expenses::create($request->all());
-        // return
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Expenses  $expenses
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Expenses $expenses)
-    {
-        //
+        $treasury =Treasury::where('store_id',$request->store_id)->first();
+        if($request->price > $treasury->price){
+            return redirect()->back()->with('error','لا يوجد فى المخزن رصيد كافى لهذا المبلغ');
+        }
+        $expenses = Expenses::create($request->all());
+        $treasury->update(['price'=>$treasury->price - $expenses->price]);
+        return redirect()->route('admin.index-expenses',$expenses->store_id);
     }
 
     /**
@@ -65,8 +68,12 @@ class ExpensesController extends Controller
      * @param  \App\Models\Expenses  $expenses
      * @return \Illuminate\Http\Response
      */
-    public function edit(Expenses $expenses)
+    public function edit($expenses)
     {
+        if(!in_array(136,permissions())){
+            abort(403);
+        }
+        $expenses= Expenses::where('id',$expenses)->first();
         return View('admin.expenses.edit',compact('expenses'));
     }
 
@@ -77,19 +84,17 @@ class ExpensesController extends Controller
      * @param  \App\Models\Expenses  $expenses
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Expenses $expenses)
+    public function update(ExpensesRequest $request, $expenses)
     {
+        $treasury =Treasury::where('store_id',$request->store_id)->first();
+        if($request->price > $treasury->price){
+            return redirect()->back()->with('error','لا يوجد فى المخزن رصيد كافى لهذا المبلغ');
+        }
+        $expenses = Expenses::find($expenses);
+        $price = $expenses->price > $request->price ? $expenses->price - $request->price : $request->price - $expenses->price ;
         $expenses->update($request->all());
+        $treasury->update(['price'=>$treasury->price - $price]);
+        return redirect()->route('admin.index-expenses',$expenses->store_id);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Expenses  $expenses
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Expenses $expenses)
-    {
-        //
-    }
 }

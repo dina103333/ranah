@@ -67,10 +67,9 @@ class SellerController extends Controller
         $body = json_encode($arrData);
         QrCode::format('png')
                 ->size(500)->errorCorrection('H')
-                ->generate($body, '../public/qr_code/' . $code);
-        $qr_code_url= url('qr_code/'.$code);
-        return view('admin.sellers.qr',compact('qr_code_url'));
-                // return response()->json(['qr_code_url'=>url('qr_code/'.$code)]) ;
+                ->generate($body, public_path('/qr/') . $code);
+        $qr_code_url= url('qr/'.$code);
+        return view('admin.sellers.qr_code',compact('qr_code_url'));
     }
 
     /**

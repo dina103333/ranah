@@ -22,8 +22,8 @@ class Store extends Model
         return $this->belongsTo(Admin::class,'store_finance_manager_id');
     }
 
-    public function area(){
-        return $this->belongsTo(Area::class);
+    public function areas(){
+        return $this->hasMany(Area::class);
     }
 
     public function products(){

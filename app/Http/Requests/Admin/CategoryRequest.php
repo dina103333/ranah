@@ -26,7 +26,6 @@ class CategoryRequest extends FormRequest
         return [
             'name' => 'required',
             'status' => 'required',
-            'parent_id' => 'required',
             'image' => 'required',
         ];
     }
@@ -35,7 +34,6 @@ class CategoryRequest extends FormRequest
         return [
             'name.required' => 'يجب ادخال اسم الفئه  .',
             'status.required' => 'يجب ادخال حاله الفئه .',
-            'parent_id.required' => 'يجب اختيار الفئه الرئيسيه .',
             'image.required' => 'يجب اخيتيار صوره للفئه .',
         ];
     }

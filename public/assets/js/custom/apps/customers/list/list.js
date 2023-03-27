@@ -1,4 +1,5 @@
 var datatable;
+
 $(document).on('click', '.delete', function (e) {
     Swal.fire({
         title: 'هل انت متأكد؟',
@@ -102,9 +103,9 @@ var KTCustomersList = function () {
                     render: function (data, type, row) {
                         return `
                         <div class= "d-flex">
-                            <a class="btn" href='/admin/officials/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class=" px-3 btn edit" href='/admin/officials/${data}/edit' ><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             <button  data-url='/admin/officials/${data}'
-                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                                class="btn px-3 delete"><i class="fas fa-trash-alt " style="color:red"></i>
                             </button>
                             </div>
                         `;

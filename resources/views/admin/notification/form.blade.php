@@ -43,7 +43,7 @@
         <label class="fs-6 fw-bold mb-2">
             <span class="required">العملاء</span>
         </label>
-        <select name="user_id[]" aria-label="Select a Country" data-placeholder="اختر العملاء" data-control="select2"  class="form-select  form-select-solid fw-bolder">
+        <select name="user_id[]" multiple aria-label="Select a Country" data-placeholder="اختر العملاء" data-control="select2"  class="form-select  form-select-solid fw-bolder">
             <option value="">اختر العملاء </option>
                 @foreach ($users as $user)
                     <option value="{{$user->id}}">{{$user->name}}</option>

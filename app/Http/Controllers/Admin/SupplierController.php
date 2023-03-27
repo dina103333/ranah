@@ -18,6 +18,9 @@ class SupplierController extends Controller
      */
     public function index()
     {
+        if(!in_array(194,permissions())){
+            abort(403);
+        }
         $suppliers = Supplier::latest()->paginate('10');
         return view('admin.supplier.index',compact('suppliers'));
     }
@@ -35,6 +38,9 @@ class SupplierController extends Controller
      */
     public function create()
     {
+        if(!in_array(193,permissions())){
+            abort(403);
+        }
         $status = Supplier::getEnumValues('suppliers','status');
         return view('admin.supplier.create',compact('status'));
     }
@@ -53,7 +59,7 @@ class SupplierController extends Controller
 
         return redirect()->route('admin.suppliers.index')->with('success','تم اضافه بائع بنجاح');
     }
-
+    
     /**
      * Display the specified resource.
      *
@@ -73,6 +79,9 @@ class SupplierController extends Controller
      */
     public function edit(Supplier $supplier)
     {
+        if(!in_array(192,permissions())){
+            abort(403);
+        }
         $status = Supplier::getEnumValues('suppliers','status');
         return view('admin.supplier.edit',compact('supplier','status'));
     }
@@ -101,11 +110,17 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
+        if(!in_array(195,permissions())){
+            abort(403);
+        }
         $supplier->delete();
     }
 
     public function multiSuppliersDelete(Request $request)
     {
+        if(!in_array(195,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         Supplier::whereIn('id',explode(",",$ids))->delete();
 

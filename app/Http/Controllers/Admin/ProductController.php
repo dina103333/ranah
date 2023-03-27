@@ -23,6 +23,9 @@ class ProductController extends Controller
      */
     public function index()
     {
+        if(!in_array(74,permissions())){
+            abort(403);
+        }
         $products = Product::paginate(10);
         return view('admin.product.index',compact('products'));
     }
@@ -39,6 +42,9 @@ class ProductController extends Controller
      */
     public function create()
     {
+        if(!in_array(73,permissions())){
+            abort(403);
+        }
         $companies = Company::where('status','تفعيل')->get();
         $status = Product::getEnumValues('products','status');
         $discount = Product::getEnumValues('products','discount');
@@ -64,10 +70,10 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $file = $request->file('image')->store('public/files');
+        $file = $request->file('image')->store('public/files/products');
         $filepath=explode('/',$file);
         $product = Product::create($request->except(['image']));
-        $product->image = $filepath[1].'/'.$filepath[2];
+        $product->image = $filepath[1].'/'.$filepath[2].'/'.$filepath[3];
         $product->save();
         return redirect(route('admin.products.index'))->with('success','تم اضافه المنتج بنجاح');
     }
@@ -148,6 +154,9 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        if(!in_array(75,permissions())){
+            abort(403);
+        }
         $companies = Company::where('status','تفعيل')->get();
         $status = Product::getEnumValues('products','status');
         $discount = Product::getEnumValues('products','discount');
@@ -173,9 +182,9 @@ class ProductController extends Controller
         // return $request;
         $product->update($request->except(['image']));
         if($request->file('image')){
-            $file = $request->file('image')->store('public/files');
+            $file = $request->file('image')->store('public/files/products');
             $filepath=explode('/',$file);
-            $product->image = $filepath[1].'/'.$filepath[2];
+            $product->image = $filepath[1].'/'.$filepath[2].'/'.$filepath[3];
             $product->save();
         }
         return redirect(route('admin.products.index'))->with('success','تم تعديل المنتج بنجاح');
@@ -189,7 +198,21 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        if(!in_array(76,permissions())){
+            abort(403);
+        }
         $product->delete();
+    }
+
+    public function multiProductsDelete(Request $request)
+    {
+        if(!in_array(76,permissions())){
+            abort(403);
+        }
+        $ids = $request->ids;
+        Product::whereIn('id',explode(",",$ids))->delete();
+
+        return response()->json(['status' => true, 'message' => "Records deleted successfully."]);
     }
 
     public function export()

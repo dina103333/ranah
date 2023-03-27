@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\DriectOrderRequest;
 use App\Jobs\SendFCMNotificationJob;
+use App\Models\Contact;
 use App\Models\Custody;
 use App\Models\Discount;
 use App\Models\DiscountProduct;
@@ -20,6 +21,7 @@ use App\Models\Setting;
 use App\Models\Shop;
 use App\Models\Store;
 use App\Models\StoreProduct;
+use App\Models\Treasury;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\WalletValue;
@@ -37,15 +39,41 @@ class OrderController extends Controller
      */
     public function index()
     {
+        if(!in_array(62,permissions())){
+            abort(403);
+        }
+        if(auth()->user()->type == 'المسؤول العام'){
+            $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date")
+            ,\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))
+            ->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')
+            ->paginate(10);
+            $stores = Store::where('status','تفعيل')->select('id','name')->get();
+        }else{
+            $orders = Order::where('store_id',auth()->user()->store_id)
+            ->select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date")
+            ,\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))
+            ->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')
+            ->paginate(10);
+            $stores = Store::where('status','تفعيل')->where('id',auth()->user()->store_id)->select('id','name')->get();
+        }
         updateFirebaseNotification('0', '0');
-        $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date"),\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')->paginate(10);
-        $stores = Store::where('status','تفعيل')->select('id','name')->get();
         return view('admin.order.index',compact('orders','stores'));
     }
 
     public function getOrders()
     {
-        $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date"),\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')->get();
+        if(auth()->user()->type == 'المسؤول العام'){
+            $orders = Order::select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date")
+            ,\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))
+            ->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')
+            ->get();
+        }else{
+            $orders = Order::where('store_id',auth()->user()->store_id)
+            ->select('*',\DB::raw("(DATE_FORMAT(created_at,'%Y-%m-%d')) as created_date")
+            ,\DB::raw("(DATE_FORMAT(updated_at,'%Y-%m-%d')) as delivered_date"))
+            ->with('user:id,name','driver:id,name','shop:id,area_id','shop.area:id,name','store:id,name')
+            ->get();
+        }
         return datatables($orders)->make(true);
     }
 
@@ -69,6 +97,9 @@ class OrderController extends Controller
      */
     public function create()
     {
+        if(!in_array(107,permissions())){
+            abort(403);
+        }
         $stores = Store::where('status', 'تفعيل')->get();
         return view('admin.direct_order.create',compact('stores'));
     }
@@ -126,6 +157,7 @@ class OrderController extends Controller
             'store_id'      => $request->store_id,
             'sub_total'     => 0,
             'total'         => 0,
+            'total_cost'    => 0,
             'distance'      => (Double) number_format($distance),
             'fee'           => Setting::where('key','سعر الشحن للكيلو الواحد')->first()->value,
             'status'        => 'معلق',
@@ -174,6 +206,7 @@ class OrderController extends Controller
         $wholesale_quantity = array_filter($request->wholesale_quantity, fn ($value) => !is_null($value));
         $unit_quantity = array_filter($request->unit_quantity, fn ($value) => !is_null($value));
         $total=[];
+        $cost_total = [];
         foreach($products as $key=>$product){
             $store_product = StoreProduct::where('product_id',$product)->where('store_id',$store->id)->first();
             $product_data = Product::where('id',$product)->select('id','wholesale_quantity_units')->first();
@@ -195,12 +228,16 @@ class OrderController extends Controller
                 'unit_price'                     => $store_product->sell_item_price,
                 'wholesale_price'                => $store_product->sell_wholesale_price,
                 'total'                          => ($wholesale_quantity[$key]  * $store_product->sell_wholesale_price) + ($unit_quantity[$key] *$store_product->sell_item_price ),
+                'unit_buy_price'                 => $store_product->buy_price / $product_data->wholesale_quantity_units ,
+                'wholesale_buy_price'            => $store_product->buy_price ,
+                'total_cost'                     => ($store_product->buy_price * $wholesale_quantity[$key]) + (($store_product->buy_price / $product_data->wholesale_quantity_units) * $unit_quantity[$key]),
             ]);
             $this->addDiscountProduct($product,$order,$wallet,$products);
             $total[] = $products->total - ( $products->item_discount  + $products->wholesale_discount );
+            $cost_total[] = $products->total_cost;
             $this->updateStoreQuantity($wholesale_quantity ,$store_product,$key,$product_data,$unit_quantity);
         }
-        $this->updateOrderTotal($total,$wallet,$order,$discount);
+        $this->updateOrderTotal($total,$wallet,$order,$discount,$cost_total);
         $this->addPoints($order,$user);
     }
 
@@ -208,7 +245,7 @@ class OrderController extends Controller
         if($wholesale_quantity != 0 ){
             $store_product->update([
                 'wholesale_quantity' => $store_product->wholesale_quantity - $wholesale_quantity[$key] ,
-                'unit_quantity' =>  $store_product->unit_quantity - ($wholesale_quantity[$key]  * $product_data->wholesale_quantity_units),
+                'unit_quantity' =>  $store_product->unit_quantity - (($wholesale_quantity[$key]  * $product_data->wholesale_quantity_units) + $unit_quantity[$key]),
             ]);
         }else{
             $store_product->update([
@@ -260,9 +297,9 @@ class OrderController extends Controller
 
     }
 
-    function updateOrderTotal($total,$wallet,$order,$discount){
+    function updateOrderTotal($total,$wallet,$order,$discount,$cost_total){
        return $order_total = (array_sum($total) + ($order->fee * $order->distance)) > $wallet->value ?  (array_sum($total) + ($order->fee * $order->distance)) - $wallet->value : 0;
-        $order->update(['sub_total'=>array_sum($total) ,'total' => $order_total,
+        $order->update(['sub_total'=>array_sum($total) ,'total' => $order_total,'total_cost'=>$cost_total,
         'discount_price'   => $discount ? ($discount->type == 'فورى' ? ($discount->value == null ? (array_sum($total) * ($discount->ratio/100))  : $discount->value)  :  null) : null]);
 
         if((array_sum($total) + ($order->fee * $order->distance)) > $wallet->value ){
@@ -309,7 +346,9 @@ class OrderController extends Controller
      */
     public function show(Request $request,Order $order)
     {
-        updateFirebaseNotification('-','1');
+        if(!in_array(208,permissions())){
+            abort(403);
+        }
         $order = Order::withSum('discounts','value')->with(['promo'=>function($q){
             $q->withTrashed()->select('id','value');
         },'shop:id,name','user:id,name,mobile_number'
@@ -363,7 +402,7 @@ class OrderController extends Controller
             if($discount && $discount->type == 'مؤجل'){
                 $this->addWalletValue($discount,$order,$wallet);
             }
-            return $this->updateOrderTotal($total,$wallet,$order,$discount);
+            return $this->updateOrderTotal($total,$wallet,$order,$discount,$response['total_cost']);
             $this->addPoints($order,$user);
         }else{
             return response()->json(['status'=> false , 'message'=>$response['message']]);
@@ -390,7 +429,7 @@ class OrderController extends Controller
             if($discount && $discount->type == 'مؤجل'){
                 $this->addWalletValue($discount,$order,$wallet);
             }
-            $this->updateOrderTotal($total,$wallet,$order,$discount);
+            $this->updateOrderTotal($total,$wallet,$order,$discount,$response['total_cost']);
 
             $order->update(['status'=>'تم التسليم',]);
             $this->addPoints($order,$user);
@@ -403,6 +442,7 @@ class OrderController extends Controller
 
     public function updateOrderProducts($request,$order,$wallet){
         $total=[];
+        $total_cost=[];
 
         foreach($request->wholesale_quantity as $key=>$quantity){
             $order_product = OrderProduct::where('order_id',$request->order_id)->where('product_id',$quantity[0])->first();
@@ -420,10 +460,12 @@ class OrderController extends Controller
                 'current_wholesale_quantity' => $quantity[1],
                 'past_unit_quantity'         => $order_product->current_unit_quantity,
                 'past_wholesale_quantity'    => $order_product->current_wholesale_quantity,
-                'total'                      => ($order_product->wholesale_price * $quantity[1]) + ($order_product->unit_price * $request->unit_quantity[$key][1])
+                'total'                      => ($order_product->wholesale_price * $quantity[1]) + ($order_product->unit_price * $request->unit_quantity[$key][1]),
+                'total_cost'                 => ($store_product->buy_price * $quantity[1]) + (($store_product->buy_price / $product->wholesale_quantity_units) * $request->unit_quantity[$key][1]),
             ]);
             $this->addDiscountProduct($quantity[0],$order,$wallet,$order_product);
             $total[]= $order_product->total - ($order_product->item_discount  + $order_product->wholesale_discount);
+            $total_cost[]= $order_product->total_cost;
 
             if($order_product->current_wholesale_quantity > $order_product->past_wholesale_quantity){
                 $wholesale_quantity = $order_product->current_wholesale_quantity - $order_product->past_wholesale_quantity;
@@ -454,7 +496,7 @@ class OrderController extends Controller
                 ]);
             }
         }
-        return ['status'=>true , 'total'=>$total];
+        return ['status'=>true , 'total'=>$total,'total_cost'=>$total_cost];
         // return $total;
     }
 
@@ -493,7 +535,8 @@ class OrderController extends Controller
         $order = Order::withSum('discounts','value')->with('shop:id,name,address,area_id','shop.area:id,name','user:id,name,mobile_number','store:id,name','products')->where('id',$order)->first();
         $status = Order::getEnumValues('orders','status');
         $wallet = Wallet::where('user_id',$order->user_id)->first();
-        return view('admin.order.bill',compact('order','status','wallet'));
+        $contact_numbers = Contact::where('type','اتصال')->get();
+        return view('admin.order.bill',compact('order','status','wallet','contact_numbers'));
     }
 
     public function addDirectDiscount(Request $request){
@@ -503,9 +546,12 @@ class OrderController extends Controller
 
 
     public function dropCustodies(Request $request){
-        Custody::where('order_id',$request->order_id)->update([
+        $order = Order::find($request->order_id);
+        $custody = Custody::where('order_id',$request->order_id)->update([
             'delivered_from_driver' => true
         ]);
+        $treasury = Treasury::where('store_id',$order->store_id)->first();
+        $treasury->update(['price' =>  $treasury->price + $custody->mony]);
         OrderReturn::where('order_id',$request->order_id)->update(['status'=>'تم الاستلام']);
     }
 }

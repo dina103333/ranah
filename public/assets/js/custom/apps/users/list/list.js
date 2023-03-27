@@ -171,11 +171,11 @@ var KTRolesList = function () {
                         return `
                             <div class="d-flex">
                                 <a class="btn" href='/admin/users/${data}' class=" px-3"><i class="fas fa-eye"></i></a>
-                                <a class="btn" href='/admin/users/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                                <a class="btn edit" href='/admin/users/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                             </div>
                             <div class="d-flex">
-                                <a href="/admin/user-wallet/${data}" class="btn" title="محفظه العميل"> <i class="fas fa-wallet" style="color: red"></i></a>
-                                <button onclick="points(${row.points},${data})" class="btn" title="نقط العميل"><i class="fas fa-hand-point-up" style="color: #acac30;"></i></button>
+                                <a href="/admin/user-wallet/${data}" class="btn wallet" title="محفظه العميل"> <i class="fas fa-wallet" style="color: red"></i></a>
+                                <button onclick="points(${row.points},${data})" class="btn points" title="نقط العميل"><i class="fas fa-hand-point-up" style="color: #acac30;"></i></button>
                             </div>
                         `;
                     },

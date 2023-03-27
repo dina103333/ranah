@@ -17,6 +17,9 @@ class ShopController extends Controller
      */
     public function index()
     {
+        if(!in_array(159,permissions())){
+            abort(403);
+        }
         $shops_type = ShopType::latest()->paginate('10');
         return view('admin.shops.index',compact('shops_type'));
     }
@@ -34,6 +37,9 @@ class ShopController extends Controller
      */
     public function create()
     {
+        if(!in_array(132,permissions())){
+            abort(403);
+        }
         $status = ShopType::getEnumValues('areas','status');
         return view('admin.shops.create',compact('status'));
     }
@@ -73,6 +79,9 @@ class ShopController extends Controller
      */
     public function edit($shop_type)
     {
+        if(!in_array(133,permissions())){
+            abort(403);
+        }
         $shop_type = ShopType::find($shop_type);
         $status = ShopType::getEnumValues('areas','status');
         return view('admin.shops.edit',compact('status','shop_type'));
@@ -103,12 +112,18 @@ class ShopController extends Controller
      */
     public function destroy($shop_type)
     {
+        if(!in_array(134,permissions())){
+            abort(403);
+        }
         $shop_type = ShopType::find($shop_type);
         $shop_type->delete();
     }
 
     public function multiShopsDelete(Request $request)
     {
+        if(!in_array(134,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         ShopType::whereIn('id',explode(",",$ids))->delete();
 

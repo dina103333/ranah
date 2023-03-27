@@ -99,7 +99,7 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/edit-store-product/${data}/${store_id}' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                            <a class="btn edit" href='/admin/edit-store-product/${data}/${store_id}' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                         `;
                     },
                 },

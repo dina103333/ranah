@@ -16,6 +16,9 @@ class AreaController extends Controller
      */
     public function index()
     {
+        if(!in_array(70,permissions())){
+            abort(403);
+        }
         $areas = Area::latest()->paginate('10');
         return view('admin.area.index',compact('areas'));
     }
@@ -33,6 +36,9 @@ class AreaController extends Controller
      */
     public function create()
     {
+        if(!in_array(69,permissions())){
+            abort(403);
+        }
         $status = Area::getEnumValues('areas','status');
         return view('admin.area.create',compact('status'));
     }
@@ -72,6 +78,9 @@ class AreaController extends Controller
      */
     public function edit(Area $area)
     {
+        if(!in_array(71,permissions())){
+            abort(403);
+        }
         $status = Area::getEnumValues('areas','status');
         return view('admin.area.edit',compact('status','area'));
     }
@@ -101,11 +110,17 @@ class AreaController extends Controller
      */
     public function destroy(Area $area)
     {
+        if(!in_array(72,permissions())){
+            abort(403);
+        }
         $area->delete();
     }
 
     public function multiAreasDelete(Request $request)
     {
+        if(!in_array(72,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         Area::whereIn('id',explode(",",$ids))->delete();
 

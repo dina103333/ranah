@@ -22,9 +22,11 @@
                     </div>
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end" data-kt-role-table-toolbar="base">
-                            <button onclick="show()" class="btn btn-light me-3 returns">
-                                المرتجعات
-                              </button>
+                            @if(in_array(184,permissions()))
+                                <button onclick="show()" class="btn btn-light me-3 returns">
+                                    المرتجعات
+                                </button>
+                            @endif
                             @if(count($order->returns)>0)
                                 <button onclick="dropCustodies({{$order->id}})" type="button" class="btn btn-light me-3">اسقاط عهده السائق</button>
                             @endif
@@ -195,21 +197,36 @@
                                             <td class="text-center w-10px pe-2"></td>
                                             <td class="text-center w-80px">{{isset($status) ? 'الحاله': ''}}</td>
                                             <td class="text-center w-80px">
-                                                @if(isset($status))
-                                                    <select name="status" class="form-select form-select-lg mb-3 status">
-                                                        @foreach ($status as $state)
-                                                            <option value="{{$state}}" {{$order->status == $state ? 'selected' : ''}}>{{$state}}</option>
-                                                        @endforeach
-                                                    </select>
-                                                @else
-                                                    <button onclick="confirm({{$order->id}})" class="btn btn-success">تأكيد الطلب</button>
+                                                @if(in_array(63,permissions()))
+                                                    @if(isset($status))
+                                                        <select name="status" class="form-select form-select-lg mb-3 status">
+                                                            @foreach ($status as $state)
+                                                                <option value="{{$state}}"
+                                                                style = "{{$state == 'جاري المعالجه' ? (!in_array(203,permissions()) ? 'display: none;': '') :
+                                                                    ($state == 'تم التأكيد' ? (!in_array(205,permissions()) ? 'display: none;': '') :
+                                                                    ($state == 'جاري التحضير' ? (!in_array(204,permissions()) ? 'display: none;': '') :
+                                                                    ($state == 'تم التسليم' ? (!in_array(202,permissions()) ? 'display: none;': '') : '')
+                                                                )) }}"
+                                                                 {{$order->status == $state ? 'selected' : ''}}
+                                                                 >{{$state}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @else
+                                                    @if(in_array(205,permissions()))
+                                                        <button onclick="confirm({{$order->id}})" class="btn btn-success">تأكيد الطلب</button>
+                                                    @endif
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="text-center w-80px">
-                                                @if(isset($status))
-                                                    <button onclick="saveChanges({{$order->id}})" class="btn btn-success">حفظ التغييرات</button>
-                                                @else
-                                                    <button data-url='/admin/orders/{{$order->id}}' class="btn btn-danger cancel">الفاء الطلب</button>
+                                                @if(in_array(63,permissions()))
+                                                    @if(isset($status))
+                                                        @if($order->status != 'فى الطريق' && $order->status != 'تم التسليم' && $order->status != 'تم الالغاء')
+                                                            <button onclick="saveChanges({{$order->id}})" class="btn btn-success">حفظ التغييرات</button>
+                                                        @endif
+                                                    @else
+                                                        <button data-url='/admin/orders/{{$order->id}}' class="btn btn-danger cancel">الفاء الطلب</button>
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td class="text-center w-80px"></td>

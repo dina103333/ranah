@@ -30,10 +30,21 @@
                     </div>
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end" data-kt-role-table-toolbar="base">
-                            <a href="{{route('admin.create-transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">نقل بضاعه</a>
-                            <a href="{{route('admin.transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">البضاعه المنقوله للمخزن</a>
-                            <a href="#" type="button" class="btn btn-light-primary me-3">الايرادات</a>
-                            <a href="{{route('admin.index-expenses',$store_id)}}" type="button" class="btn btn-light-primary me-3">المصروفات</a>
+                            @if(in_array(112,permissions()))
+                                <a href="{{route('admin.create-transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">نقل بضاعه</a>
+                            @endif
+                            @if(in_array(111,permissions()))
+                                <a href="{{route('admin.transfers',$store_id)}}" type="button" class="btn btn-light-primary me-3">البضاعه المنقوله للمخزن</a>
+                            @endif
+                            @if(in_array(22,permissions()))
+                                <a href="{{route('admin.index-revenues',$store_id)}}" type="button" class="btn btn-light-primary me-3">الايرادات</a>
+                            @endif
+                            @if(in_array(160,permissions()))
+                                <a href="{{route('admin.index-expenses',$store_id)}}" type="button" class="btn btn-light-primary me-3">المصروفات</a>
+                            @endif
+                            @if(in_array(206,permissions()))
+                                <button type="button" class="btn btn-light-primary me-3 treasury">الخزنه</button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -43,7 +54,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_roles_table">
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
-                                    <th> اسم المنتج</th>
+                                    <th> اسم المنتج </th>
                                     <th> اسم الشركة</th>
                                     <th> اسم الفئة الفرعى</th>
                                     <th> الكمية</th>
@@ -67,6 +78,24 @@
                 </div>
             </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">الخزنه</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <h4>اجمالى المبلغ فى الخزنه : {{$treasury}}</h4>
+                    <h4>اجمالى الايرادات : {{$revenues}}</h4>
+                    <h4>اجمالى المصروفات : {{$expenses}}</h4>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="hideModele()">اغلاق</button>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -77,6 +106,25 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+        $('.treasury').click(function() {
+            $('#exampleModal').modal('show')
+        })
+        function hideModele(){
+            $('#exampleModal').modal('hide')
+        }
+        $(document).ready(function(event) {
+            $.ajax({
+                type: 'get',
+                url: '/admin/user-permission',
+                success: function(response) {
+                    if ($.inArray(77, response) !== -1) {
+                        $('.edit').show();
+                    } else {
+                        $('.edit').hide();
+                    }
+                }
+            });
+        });
     </script>
 @endsection
 

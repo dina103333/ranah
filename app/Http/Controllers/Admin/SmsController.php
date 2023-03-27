@@ -21,6 +21,9 @@ class SmsController extends Controller
      */
     public function index()
     {
+        if(!in_array(54,permissions())){
+            abort(403);
+        }
         $sms = Sms::join('users','users.id','sms_messages.to_user_id')
         ->join('admins','admins.id','sms_messages.from_admin_id')
         ->select('admins.name as admin_name','users.name as user_name','sms_messages.id','sms_messages.message'
@@ -48,6 +51,9 @@ class SmsController extends Controller
      */
     public function create()
     {
+        if(!in_array(53,permissions())){
+            abort(403);
+        }
         $users = User::where('active',true)->where('status','تفعيل')->get();
         $areas = Area::where('status','تفعيل')->get();
         return view('admin.sms.create',compact('users','areas'));
@@ -119,6 +125,6 @@ class SmsController extends Controller
             'message' =>$sms->message,
         ]);
         $user = User::where('id',$sms->to_user_id)->first();
-        dispatch(new SendSmsJob($user->mobile_number));
+        dispatch(new SendSmsJob($user->mobile_number,$sms->message));
     }
 }

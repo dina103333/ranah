@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductCommentRequest;
 use App\Http\Resources\Api\ProductResource;
 use App\Http\Resources\Api\ShowProductResource;
+use App\Models\Area;
 use App\Models\OrderProduct;
 use App\Models\Product;
 use App\Models\ProductComment;
@@ -20,12 +21,16 @@ class ProductController extends Controller
     public function getProducts(Request $request){
         if(!$request->user()){
             $store = Store::where('status','تفعيل')->select('id')->first();
+            if(!$store){
+                return  $this->error('غير متوفر الان',422);
+            }
         }else{
             $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
             if(!$shop){
                 return  $this->error('هذا المستخدم لم يكمل بيانات المحل الخاص به',422);
             }
-            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            $area = Area::find($shop->area_id);
+            $store = Store::where('status','تفعيل')->where('id',$area->store_id)->select('id')->first();
             if(!$store){
                 return  $this->error('لا يوجد مخزن فى هذه المنطقه او قد يكون المخزن غير مفعل',422);
             }
@@ -47,12 +52,16 @@ class ProductController extends Controller
     public function showProduct(Request $request){
         if(!$request->user()){
             $store = Store::where('status','تفعيل')->select('id')->first();
+            if(!$store){
+                return  $this->error('غير متوفر الان',422);
+            }
         }else{
             $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
             if(!$shop){
                 return  $this->error('هذا المستخدم لم يكمل بيانات المحل الخاص به',422);
             }
-            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            $area = Area::find($shop->area_id);
+            $store = Store::where('status','تفعيل')->where('id',$area->store_id)->select('id')->first();
             if(!$store){
                 return  $this->error('لا يوجد مخزن فى هذه المنطقه او قد يكون المخزن غير مفعل',422);
             }
@@ -71,8 +80,6 @@ class ProductController extends Controller
                 $q->where('carts.shop_id',$request->user()->shop_id);
             }
         }])->first();
-        $auth = $request->user() ? true : false;
-        $products->append('auth',$auth);
         if($products){
             return $this->successSingle('تم بنجاح',ShowProductResource::make($products),200);
         }else{
@@ -85,12 +92,16 @@ class ProductController extends Controller
     public function SearchProducts(Request $request){
         if(!$request->user()){
             $store = Store::where('status','تفعيل')->select('id')->first();
+            if(!$store){
+                return  $this->error('غير متوفر الان',422);
+            }
         }else{
             $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
             if(!$shop){
                 return  $this->error('هذا المستخدم لم يكمل بيانات المحل الخاص به',422);
             }
-            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            $area = Area::find($shop->area_id);
+            $store = Store::where('status','تفعيل')->where('id',$area->store_id)->select('id')->first();
             if(!$store){
                 return  $this->error('لا يوجد مخزن فى هذه المنطقه او قد يكون المخزن غير مفعل',422);
             }
@@ -125,9 +136,13 @@ class ProductController extends Controller
     public function bestSellingProducts(Request $request){
         if(!$request->user()){
             $store = Store::where('status','تفعيل')->select('id')->first();
+            if(!$store){
+                return  $this->error('غير متوفر الان',422);
+            }
         }else{
             $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
-            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            $area = Area::find($shop->area_id);
+            $store = Store::where('status','تفعيل')->where('id',$area->store_id)->select('id')->first();
         }
         $bestSellers = Product::withCount('totalSold')
                         ->whereHas('stores',function($q) use($store){
@@ -145,12 +160,16 @@ class ProductController extends Controller
     public function getDiscountsOfPorducts(Request $request){
         if(!$request->user()){
             $store = Store::where('status','تفعيل')->select('id')->first();
+            if(!$store){
+                return  $this->error('غير متوفر الان',422);
+            }
         }else{
             $shop = Shop::where('id',$request->user()->shop_id)->select('area_id')->first();
             if(!$shop){
                 return  $this->error('هذا المستخدم لم يكمل بيانات المحل الخاص به',422);
             }
-            $store = Store::where('status','تفعيل')->where('area_id',$shop->area_id)->select('id')->first();
+            $area = Area::find($shop->area_id);
+            $store = Store::where('status','تفعيل')->where('id',$area->store_id)->select('id')->first();
             if(!$store){
                 return  $this->error('لا يوجد مخزن فى هذه المنطقه او قد يكون المخزن غير مفعل',422);
             }

@@ -9,6 +9,7 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use App\Models\Permission;
 use App\Models\PermissionRole;
+use App\Models\PermissionUser;
 use App\Models\Role;
 
 class RoleController extends Controller
@@ -20,6 +21,9 @@ class RoleController extends Controller
      */
     public function index()
     {
+        if(!in_array(198,permissions())){
+            abort(403);
+        }
         $roles = Role::get();
         return view('admin.role.index',compact('roles'));
     }
@@ -37,6 +41,9 @@ class RoleController extends Controller
      */
     public function create()
     {
+        if(!in_array(197,permissions())){
+            abort(403);
+        }
         $groups = Group::get();
         $permissions = Permission::select('id','group_id','display_name','dispaly_name_ar')->get();
         $status = Role::getEnumValues('roles','status');
@@ -86,6 +93,9 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
+        if(!in_array(196,permissions())){
+            abort(403);
+        }
         $groups = Group::get();
         $permissions = Permission::select('id','group_id','display_name','dispaly_name_ar')->get();
         $role = Role::with('permissions')->where('id',$id)->first();
@@ -108,13 +118,21 @@ class RoleController extends Controller
             'name' =>$request->name,
             'status' =>$request->status,
         ]);
+        $admins = Admin::where('role_id',$role->id)->pluck('id')->toArray();
         PermissionRole::where('role_id',$id)->delete();
+        PermissionUser::whereIn('admin_id',$admins)->delete();
         if($request->permissions){
-            foreach($request->permissions as $permission){
-                PermissionRole::create([
-                    'permission_id' => $permission,
-                    'role_id'=> $id
-                ]);
+            foreach($admins as $admin){
+                foreach($request->permissions as $permission){
+                    PermissionRole::create([
+                        'permission_id' => $permission,
+                        'role_id'=> $id
+                    ]);
+                    PermissionUser::create([
+                        'permission_id' => $permission,
+                        'admin_id' => $admin,
+                    ]);
+                }
             }
         }
         return redirect()->route('admin.roles.index')->with('success','تم تعديل الدور بنجاح');
@@ -128,6 +146,9 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
+        if(!in_array(199,permissions())){
+            abort(403);
+        }
         PermissionRole::where('role_id',$id)->delete();
         Admin::where('role_id',$id)->update(['role_id'=>null]);
         Role::find($id)->delete();

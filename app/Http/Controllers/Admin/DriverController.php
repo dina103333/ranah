@@ -19,6 +19,9 @@ class DriverController extends Controller
      */
     public function index()
     {
+        if(!in_array(34,permissions())){
+            abort(403);
+        }
         $drivers = Driver::latest()->paginate('10');
         return view('admin.drivers.index',compact('drivers'));
     }
@@ -36,6 +39,9 @@ class DriverController extends Controller
      */
     public function create()
     {
+        if(!in_array(33,permissions())){
+            abort(403);
+        }
         $status = Driver::getEnumValues('drivers','status');
         $stores = Store::where('status','تفعيل')->get();
         return view('admin.drivers.create',compact('status','stores'));
@@ -80,6 +86,9 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
+        if(!in_array(35,permissions())){
+            abort(403);
+        }
         $status = Driver::getEnumValues('drivers','status');
         $stores = Store::where('status','تفعيل')->get();
         return view('admin.drivers.edit',compact('driver','status','stores'));
@@ -114,11 +123,17 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
+        if(!in_array(36,permissions())){
+            abort(403);
+        }
         $driver->delete();
     }
 
     public function multiDriversDelete(Request $request)
     {
+        if(!in_array(36,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         Driver::whereIn('id',explode(",",$ids))->delete();
 

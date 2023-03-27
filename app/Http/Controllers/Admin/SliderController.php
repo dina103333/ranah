@@ -20,6 +20,9 @@ class SliderController extends Controller
      */
     public function index()
     {
+        if(!in_array(87,permissions())){
+            abort(403);
+        }
         $sliders = Slider::paginate('10');
         return view('admin.slider.index',compact('sliders'));
     }
@@ -37,6 +40,9 @@ class SliderController extends Controller
      */
     public function create()
     {
+        if(!in_array(86,permissions())){
+            abort(403);
+        }
         $products = Product::where('status', 'تفعيل')->select('id','name')->get();
         $types = Slider::getEnumValues('sliders','type');
         return view('admin.slider.create',compact('types','products'));
@@ -84,6 +90,9 @@ class SliderController extends Controller
      */
     public function edit(Slider $slider)
     {
+        if(!in_array(88,permissions())){
+            abort(403);
+        }
         $products = Product::where('status', 'تفعيل')->select('id','name')->get();
         $types = Slider::getEnumValues('sliders','type');
         $slider_products = $slider->products()->select('products.id')->pluck('products.id')->toArray();
@@ -125,12 +134,18 @@ class SliderController extends Controller
      */
     public function destroy(Slider $slider)
     {
+        if(!in_array(89,permissions())){
+            abort(403);
+        }
         SliderProduct::where('slider_id',$slider->id)->delete();
         $slider->delete();
     }
 
     public function multiSlidersDelete(Request $request)
     {
+        if(!in_array(89,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         SliderProduct::whereIn('slider_id',explode(",",$ids))->delete();
         Slider::whereIn('id',explode(",",$ids))->delete();

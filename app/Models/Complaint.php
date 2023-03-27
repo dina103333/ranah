@@ -10,4 +10,8 @@ class Complaint extends Model
     use HasFactory;
     protected $guarded=[];
     protected $table = 'complaints';
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

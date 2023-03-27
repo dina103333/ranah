@@ -53,11 +53,43 @@ class OrderController extends Controller
     }
 
     public function deliveredOrder(Request $request){
-        $order = Order::where('id',$request->order_id)->where('delivered_from_store',true)->first();
+        $order = Order::where('id',$request->order_id)
+        ->where('delivered_from_store',true)
+        ->withSum('discounts','value')
+        ->with(['products.discounts'=>function($q) use ($request){
+            $q->join('discount_products',function($join){
+                $join->on('discount_products.id','order_discounts.discount_id');
+                $join->on('discount_products.product_id','order_discounts.product_id');
+            })->where('order_discounts.order_id',$request->order_id);
+        },'promo'=>function($q){
+            $q->withTrashed()->select('id','value');
+        }])->first();
+
         if(!$order){
             return $this->error('لا يمكن تأكيد استلام الطلب قبل تأكيد تسليمه من جه المخزن',422);
         }
         $order->update(['delivered_to_driver'=>true]);
+
+        if($order->discount_price != null){
+            if($order->discounts_sum_value != null){
+                $discount_price = $order->total - $order->discount_price - $order->discounts_sum_value ;
+            }else{
+                $discount_price = $order->total - $order->discount_price ;
+            }
+        }else{
+            if($order->discounts_sum_value != null){
+                $discount_price = $order->total -  $order->discounts_sum_value ;
+            }else{
+                $discount_price = $order->total ;
+            }
+        }
+        $total_after_discount = $order->promo == null ? $discount_price : $discount_price - $order->promo->value;
+
+        Custody::create([
+            'driver_id' => $request->user()->id,
+            'order_id' => $order->id,
+            'mony' =>  $total_after_discount,
+        ]);
         return $this->successSingle('تم بنجاح',[],200);
     }
 
@@ -65,11 +97,6 @@ class OrderController extends Controller
         $order = Order::where('id',$request->order_id)->where('status','!=','تم التسليم')->first();
         if($order){
             $order->update(['status'=>'تم التسليم']);
-            Custody::create([
-                'driver_id' => $request->user()->id,
-                'order_id' => $order->id,
-                'mony' => $order->total,
-            ]);
             return $this->successSingle('تم بنجاح',[],200);
         }else{
             return $this->error('عفوا هذا الطلب تم تسليمه من قبل',422);
@@ -78,6 +105,7 @@ class OrderController extends Controller
 
     public function addReturn(Request $request){
         $order = Order::where('id',$request->order_id)->first();
+
         if($order->status != 'في الطريق'){
             return $this->error('لا يمكنك عمل مرتجع على هذا المنتج',422);
         }
@@ -90,11 +118,13 @@ class OrderController extends Controller
                     ,'current_unit_quantity' =>  $order_product->current_unit_quantity - $request->unit_returned_quantity
                     ,'current_wholesale_quantity' =>  $order_product->current_wholesale_quantity - $request->wholesale_returned_quantity
                     ,'total' =>  (($order_product->current_unit_quantity - $request->unit_returned_quantity) * $order_product->unit_price) + (($order_product->current_wholesale_quantity - $request->wholesale_returned_quantity) * $order_product->wholesale_price)
+                    ,'total_cost'=> (($order_product->current_unit_quantity - $request->unit_returned_quantity) * $order_product->unit_buy_price ) + (($order_product->current_wholesale_quantity - $request->wholesale_returned_quantity)* $order_product->wholesale_buy_price ),
                 ]);
 
         $order_products = OrderProduct::where('order_id',$request->order_id)->get()->sum('total');
+        $cost_order_products = OrderProduct::where('order_id',$request->order_id)->get()->sum('total_cost');
 
-        $order->update(['sub_total' => $order_products , 'total' => $order_products + ($order->distance * $order->fee)]);
+        $order->update(['sub_total' => $order_products , 'total' => $order_products + ($order->distance * $order->fee) , 'total_cost'=>$cost_order_products]);
         $this->saveReturns($request,$order,$order_product);
         return $this->successSingle('تم اضافه المترجعات على الطلب بنجاح',[],200);
     }
@@ -119,17 +149,30 @@ class OrderController extends Controller
 
     public function saveReturns($request,$order,$order_product){
         $returns = OrderReturn::where('order_id', $order->id)->where('product_id',$request->product_id)->first();
+        $driver_custodies =  Custody::where('driver_id',$request->user()->id)->where('order_id',$order->id)->first();
         if($returns){
+            $current_total = (($request->unit_returned_quantity) * $returns->unit_price ) + (($request->wholesale_returned_quantity) * $returns->wholesale_price );
+            $total = $current_total > $returns->total  ? $current_total - $returns->total  : $returns->total - $current_total;
+            if($current_total > $returns->total){
+                $driver_custodies->update([
+                    'mony' =>  $driver_custodies - $total,
+                ]);
+            }else{
+                $driver_custodies->update([
+                    'mony' =>  $driver_custodies + $total,
+                ]);
+            }
             $returns->update([
                 'unit_quantity'=>$returns->unit_quantity + $request->unit_returned_quantity,
                 'wholesale_quantity'=>$returns->wholesale_quantity + $request->wholesale_returned_quantity,
                 'unit_price'=> $returns->unit_price,
                 'wholesale_price'=>$returns->wholesale_price,
-                'total'=>(($returns->unit_quantity + $request->unit_returned_quantity) * $returns->unit_price ) + (($returns->wholesale_quantity + $request->wholesale_returned_quantity) * $returns->wholesale_price ),
+                'total'=>$current_total,
                 'updated_by'=>$request->user()->id,
             ]);
+
         }else{
-            OrderReturn::create([
+            $returns =OrderReturn::create([
                 'order_id' => $order->id,
                 'shop_id' => $order->shop_id,
                 'product_id' => $request->product_id,
@@ -140,6 +183,10 @@ class OrderController extends Controller
                 'total'=>($request->unit_returned_quantity * $order_product->unit_price)  + ( $request->wholesale_returned_quantity * $order_product->wholesale_price ),
                 'updated_by'=>$request->user()->id,
                 'driver_id'=>$request->user()->id,
+            ]);
+            $total = $returns->total;
+            $driver_custodies->update([
+                'mony' =>  $driver_custodies - $total,
             ]);
         }
     }
@@ -161,7 +208,7 @@ class OrderController extends Controller
 
     public function deliverCustody(Request $request){
         Custody::where('driver_id',$request->user()->id)->update(['delivered_to_store'=>true]);
-         OrderReturn::where('driver_id',$request->user()->id)->update(['delivered_from_driver'=>true]);
+        OrderReturn::where('driver_id',$request->user()->id)->update(['delivered_from_driver'=>true]);
         return $this->successSingle('تم اسقاط العهده بنجاح من جانب السائق',[],200);
     }
 

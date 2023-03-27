@@ -30,9 +30,7 @@ class StoreRequest extends FormRequest
             "longitude"             => 'required',
             "latitude"              => 'required',
             "storekeepers"          => 'required',
-            "storekeeper_id"        => 'required',
             "finance_officers"      => 'required',
-            "finance_officer_id"    => 'required',
             "sales"                 => 'required',
             "status"                => 'required',
         ];
@@ -47,9 +45,7 @@ class StoreRequest extends FormRequest
             "longitude.required"             =>  'يجب ادخال خطوط الطول .',
             "latitude.required"              =>  'يجب ادخال دوائر العرض .',
             "storekeepers.required"          =>  'يجب تحديد امناء العهد .',
-            "storekeeper_id.required"        =>  'يجب تحديد امين العهدة الحالي .',
             "finance_officers.required"      =>  'يجب تحديد مسؤولين الماليه .',
-            "finance_officer_id.required"    =>  'يجب تحديد مسؤول الماليه الحالى .',
             "sales.required"                 =>  'يجب تحديد  البائعين .',
             "status.required"                =>  'يجب تحديد الحاله .',
 

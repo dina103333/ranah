@@ -27,6 +27,13 @@ class CartController extends Controller
         if(!$product_price){
             return $this->error('عذرا هذا المنتج غير موجود بالمخزن',422);
         }
+        
+        if($product_price->max_limit !=0 ){
+            if($product_price->lower_limit > $request->wholesale_quantity || $product_price->max_limit < $request->wholesale_quantity ){
+                return $this->error('لا يمكن الطلب بهذه الكميه علما بأن اقصى كميه متاحه واقل كميه هى'.$product_price->lower_limit .'و'.$product_price->max_limit );
+            }
+        }
+
         if($request->wholesale_quantity > $product_price->wholesale_quantity || $request->unit_quantity > $product_price->unit_quantity){
             return $this->error('عذرا لا يوجد هذه الكميه بالمخزن',422);
         }

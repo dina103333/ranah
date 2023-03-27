@@ -14,6 +14,9 @@ use Illuminate\Support\Carbon;
 class DiscountController extends Controller
 {
     public function index(){
+        if(!in_array(119,permissions())){
+            abort(403);
+        }
        $discounts =Discount::orderBy('id','desc')->paginate(10);
        return view('admin.dicounts.index',compact('discounts'));
     }
@@ -24,6 +27,9 @@ class DiscountController extends Controller
     }
 
     public function create(){
+        if(!in_array(120,permissions())){
+            abort(403);
+        }
         $status = Discount::getEnumValues('discounts','status');
         $types = Discount::getEnumValues('discounts','type');
         $stores = Store::where('status','تفعيل')->select('id','name')->get();
@@ -46,6 +52,9 @@ class DiscountController extends Controller
     }
 
     public function edit(Discount $discount){
+        if(!in_array(121,permissions())){
+            abort(403);
+        }
         $status = Discount::getEnumValues('discounts','status');
         $types = Discount::getEnumValues('discounts','type');
         $stores = Store::where('status','تفعيل')->select('id','name')->get();
@@ -67,6 +76,9 @@ class DiscountController extends Controller
     }
 
     public function delete(Discount $discount){
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         $discount->delete();
     }
 

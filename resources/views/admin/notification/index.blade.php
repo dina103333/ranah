@@ -30,7 +30,9 @@
                     </div>
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end" data-kt-role-table-toolbar="base">
-                            <a href="{{route('admin.notifications.create')}}" type="button" class="btn btn-primary">اضافه اشعار</a>
+                            @if(in_array(53,permissions()))
+                                <a href="{{route('admin.notifications.create')}}" type="button" class="btn btn-primary">اضافه اشعار</a>
+                            @endif
                         </div>
                         <div class="d-flex justify-content-end align-items-center d-none" data-kt-role-table-toolbar="selected">
                             <div class="fw-bolder me-5">
@@ -72,6 +74,19 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+        $(document).ready(function(event) {
+            $.ajax({
+                type: 'get',
+                url: '/admin/user-permission',
+                success: function(response) {
+                    if ($.inArray(55, response) !== -1) {
+                        $('.delete').show();
+                    } else {
+                        $('.delete').hide();
+                    }
+                }
+            });
+        });
     </script>
 @endsection
 

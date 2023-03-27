@@ -32,6 +32,8 @@ class UserRequest extends FormRequest
             'address' => 'required|string|max:255',
             'area_id' => 'required',
             'shop_type_id' => 'required',
+            "longitude"             => 'required',
+            "latitude"              => 'required',
         ];
         if($this->method()=="POST"){
             $rules['password']='required|min:6';
@@ -52,6 +54,8 @@ class UserRequest extends FormRequest
             'address.required' => 'عنوان المحل مطلوب',
             'area_id.required' => 'المنطقه مطلوبه',
             'shop_type_id.required' => 'نوع المحل مطلوب',
+            "longitude.required"             => 'يجب ادخال خطوط الطول',
+            "latitude.required"              => 'يجب ادخال دوائر العرض',
         ];
     }
 }

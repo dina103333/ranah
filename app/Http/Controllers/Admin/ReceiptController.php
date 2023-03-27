@@ -9,6 +9,7 @@ use App\Models\ReceiptProduct;
 use App\Models\Store;
 use App\Models\StoreProduct;
 use App\Models\Supplier;
+use App\Models\Treasury;
 use Illuminate\Http\Request;
 
 class ReceiptController extends Controller
@@ -20,6 +21,9 @@ class ReceiptController extends Controller
      */
     public function index()
     {
+        if(!in_array(79,permissions())){
+            abort(403);
+        }
         $receipts = Receipt::with('store:id,name','keeper:id,name','supplier:id,name')->paginate(10);
         // return $receipts;
         return view('admin.receipt.index',compact('receipts'));
@@ -37,6 +41,9 @@ class ReceiptController extends Controller
      */
     public function create()
     {
+        if(!in_array(78,permissions())){
+            abort(403);
+        }
         $products = Product::With(['company'=>function($q){
             $q->where('status','تفعيل')->select('id','name');
         }])->select('id','name','company_id')->get();
@@ -64,13 +71,18 @@ class ReceiptController extends Controller
             return redirect()->back()->with('error','يجب ادخال المنتجات بكمياتها واسعارها وتاريخ الانتاج والانتهاء الخاص بها');
         }
 
+        $treasury =Treasury::where('store_id',$request->store_id)->first();
+        if((double) $request->total > $treasury->price){
+            return redirect()->back()->with('error','لا يوجد فى المخزن رصيد كافى لهذا المبلغ');
+        }
+
         $receipt = Receipt::Create([
             'store_id' => $request->store_id,
             'supplier_id' => $request->supplier_id,
             'total' => (double) $request->total,
             'created_by' => auth()->user()->id,
         ]);
-
+        $treasury->update(['price'=>$treasury->price - $receipt->total]);
 
         foreach($products as $Key=>$product){
             $price = str_replace( ',', '', $price[$Key] );
@@ -107,6 +119,9 @@ class ReceiptController extends Controller
      */
     public function edit(Receipt $receipt)
     {
+        if(!in_array(80,permissions())){
+            abort(403);
+        }
        $receipt = $receipt->load('products');
        $suppliers = Supplier::Where('status','تفعيل')->get();
        $stores = Store::Where('status','تفعيل')->get();
@@ -134,6 +149,14 @@ class ReceiptController extends Controller
         if(empty($products) || empty($quantity) || empty($price) || empty($production_date) || empty($expiry_date)){
             return redirect()->back()->with('error','يجب ادخال المنتجات بكمياتها واسعارها وتاريخ الانتاج والانتهاء الخاص بها');
         }
+        $treasury =Treasury::where('store_id',$request->store_id)->first();
+        if((double) str_replace(",", "", $request->total) > $treasury->price){
+            return redirect()->back()->with('error','لا يوجد فى المخزن رصيد كافى لهذا المبلغ');
+        }
+
+        $price = $receipt->total > (double) str_replace(",", "", $request->total) ?
+                $receipt->total - (double) str_replace(",", "", $request->total) :
+                (double) str_replace(",", "", $request->total) - $receipt->total ;
 
         $receipt->update([
             'store_id' => $request->store_id,
@@ -141,6 +164,8 @@ class ReceiptController extends Controller
             'total' => (double) str_replace(",", "", $request->total),
             'created_by' => auth()->user()->id,
         ]);
+
+        $treasury->update(['price'=>$treasury->price - $price]);
 
         ReceiptProduct::where('receipt_id',$receipt->id)->delete();
         foreach($products as $Key=>$product){
@@ -187,6 +212,9 @@ class ReceiptController extends Controller
      */
     public function destroy(Receipt $receipt)
     {
+        if(!in_array(81,permissions())){
+            abort(403);
+        }
         ReceiptProduct::where('receipt_id', $receipt)->delete();
         $receipt->delete();
     }

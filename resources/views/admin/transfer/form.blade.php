@@ -12,7 +12,7 @@
                         <select name="to_store_id" aria-label="Select a Country" data-placeholder="اختر المخزن" data-control="select2"  class="form-select form-select-solid fw-bolder">
                             <option value="">اختر المخزن </option>
                             @foreach ($stores as $store)
-                                <option value="{{$store->id}}" {{isset($store) ?( $store->id == $store->area_id ?'selected' : '') : ''}}>{{$store->name}}</option>
+                                <option value="{{$store->id}}">{{$store->name}}</option>
                             @endforeach
                         </select>
                     </div>

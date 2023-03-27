@@ -1,5 +1,6 @@
 var datatable;
 var store_id = $('.store_id').val();
+console.log(store_id);
 $(document).on('click', '.delete', function (e){
     Swal.fire({
             title: 'هل انت متأكد؟',
@@ -74,24 +75,12 @@ var KTRolesList = function () {
                 url: '/admin/get-expenses/'+store_id,
             },
             columns: [
-                { data: 'id' },
                 { data: 'propose'},
                 { data: 'price' },
                 { data: 'created_at' },
                 { data: 'id' },
             ],
             columnDefs: [
-                {
-                    targets: 0,
-                    orderable: false,
-                    searchable: false,
-                    render: function (data) {
-                        return `
-                            <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
-                            </div>`;
-                    }
-                },
                 {
                     targets: -1,
                     data: null,
@@ -100,10 +89,7 @@ var KTRolesList = function () {
                     className: 'text-end',
                     render: function (data, type, row) {
                         return `
-                            <a class="btn" href='/admin/expenses/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
-                            <button  data-url='/admin/expenses/${data}'
-                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
-                            </button>
+                            <a class="btn edit" href='/admin/expenses/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                         `;
                     },
                 },

@@ -24,6 +24,9 @@ class NotificationController extends Controller
      */
     public function index()
     {
+        if(!in_array(54,permissions())){
+            abort(403);
+        }
         $notifications = NotifyUser::join('users','users.id','notify_users.user_id')
         ->join('admins','admins.id','notify_users.admin_id')
         ->leftJoin('products','products.id','notify_users.product_id')
@@ -54,6 +57,9 @@ class NotificationController extends Controller
      */
     public function create()
     {
+        if(!in_array(53,permissions())){
+            abort(403);
+        }
         $users = User::where('active',true)->where('type','اونلاين')->where('status','تفعيل')->get();
         $products = Product::where('status','تفعيل')->get();
         $areas = Area::where('status','تفعيل')->get();

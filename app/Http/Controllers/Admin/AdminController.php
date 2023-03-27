@@ -20,6 +20,9 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
+        if(!in_array(2,permissions())){
+            abort(403);
+        }
         $admins = Admin::with('role')->paginate('10');
         return view('admin.admin.index',compact('admins'));
     }
@@ -38,6 +41,9 @@ class AdminController extends Controller
      */
     public function create()
     {
+        if(!in_array(1,permissions())){
+            abort(403);
+        }
         $roles = Role::where('status','تفعيل')->select('id','name')->get();
         $status = Admin::getEnumValues('admins','status');
         $types = Admin::getEnumValues('admins','type');
@@ -79,6 +85,9 @@ class AdminController extends Controller
      */
     public function edit($admin)
     {
+        if(!in_array(3,permissions())){
+            abort(403);
+        }
         $roles = Role::where('status','تفعيل')->get();
         $admin = Admin::find($admin);
         $status = Admin::getEnumValues('admins','status');
@@ -106,7 +115,7 @@ class AdminController extends Controller
             'type' =>$request->type,
         ]);
         PermissionUser::where('admin_id',$admin->id)->delete();
-        $permissions = PermissionRole::where('role_id',$admin->role_id)->pluck('permission_id');
+        $permissions = PermissionRole::where('role_id',$request->role)->pluck('permission_id');
         foreach($permissions as $permission){
             PermissionUser::create([
                 'permission_id' => $permission,
@@ -124,12 +133,18 @@ class AdminController extends Controller
      */
     public function destroy($id)
     {
+        if(!in_array(4,permissions())){
+            abort(403);
+        }
         PermissionUser::where('admin_id',$id)->delete();
         Admin::find($id)->delete();
     }
 
     public function multiAdminDelete(Request $request)
     {
+        if(!in_array(4,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         Admin::whereIn('id',explode(",",$ids))->delete();
 

@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 class WalletController extends Controller
 {
     public function DisplayUserWallet($user_id){
+        if(!in_array(209,permissions())){
+            abort(403);
+        }
         $wallet = Wallet::with('user:id,name')->where('user_id', $user_id)->first();
         $wallet_history = WalletValue::where('wallet_id', $wallet->id)->orderBy('id','desc')->paginate(10);
         return View('admin.wallet.show',compact('wallet','wallet_history'));
@@ -22,6 +25,9 @@ class WalletController extends Controller
     }
 
     public function edit($wallet_id){
+        if(!in_array(210,permissions())){
+            abort(403);
+        }
         return view('admin.wallet.edit', compact('wallet_id'));
     }
 

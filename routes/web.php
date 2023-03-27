@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\Auth\ForgetpasswordController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\ComplaintController;
+use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\DiscountController;
 use App\Http\Controllers\Admin\DiscountProductController;
 use App\Http\Controllers\Admin\DriverController;
@@ -15,8 +17,11 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PointController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\PromoCodeController;
 use App\Http\Controllers\Admin\ReceiptController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\RevenuController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SellerController;
@@ -24,6 +29,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\SmsController;
+use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\TransferController;
 use App\Http\Controllers\Admin\UserController;
@@ -72,7 +78,6 @@ Route::group([
 
 
     Route::resource('/roles', RoleController::class);
-    // Route::get('/roles',[RoleController::class,'index'])->name('roles');
     Route::get('/create-role', [RoleController::class, 'create'])->name('create-role');
     Route::post('/store-role', [RoleController::class, 'store'])->name('store-role');
     Route::get('/update-role/{id}', [RoleController::class, 'update'])->name('update-role');
@@ -81,6 +86,9 @@ Route::group([
 
     Route::resource('/categories', CategoryController::class);
     Route::get('/get-categories', [CategoryController::class, 'getCategories'])->name('get-categories');
+
+    Route::resource('/subcategories', SubCategoryController::class);
+    Route::get('/get-subcategories', [SubCategoryController::class, 'getCategories'])->name('get-subcategories');
 
     Route::resource('/companies', CompanyController::class);
     Route::get('/get-companies', [CompanyController::class, 'getcompanies'])->name('get-companies');
@@ -95,6 +103,7 @@ Route::group([
     Route::get('/export-template', [ProductController::class, 'exportTemplate'])->name('export-template');
     Route::post('/save-imported-products', [ProductController::class, 'storePulckProducts'])->name('save-imported-products');
     Route::get('/create-imported-products', [ProductController::class, 'createImported'])->name('create-imported-products');
+    Route::delete('/multiProductsDelete', [ProductController::class, 'multiProductsDelete']);
 
 
     Route::resource('/stores',StoreController::class);
@@ -213,13 +222,43 @@ Route::group([
 
 
     Route::resource('/expenses', ExpensesController::class);
+    Route::get('/get-expenses/{store_id}', [ExpensesController::class, 'getExpenses'])->name('get-expenses');
     Route::get('/index/{store_id}', [ExpensesController::class,'index'])->name('index-expenses');
     Route::get('/create/{store_id}', [ExpensesController::class,'create'])->name('create-expenses');
 
+    Route::resource('/revenues', RevenuController::class);
+    Route::get('/get-revenues/{store_id}', [RevenuController::class, 'getRevenues'])->name('get-revenues');
+    Route::get('/index-revenues/{store_id}', [RevenuController::class,'index'])->name('index-revenues');
+    Route::get('/create-revenues/{store_id}', [RevenuController::class,'create'])->name('create-revenues');
 
 
 
+    Route::get('/edit-admin', [ProfileController::class,'edit'])->name('edit-admin');
+    Route::post('/update-admin', [ProfileController::class,'update'])->name('update-admin');
+
+
+    Route::resource('/complaints', ComplaintController::class);
+    Route::get('/get-complaints', [ComplaintController::class, 'getComplaints'])->name('get-complaints');
+
+
+    Route::get('/product-complaints', [ComplaintController::class,'productComplaint'])->name('product-complaints');
+    Route::get('/get-product-complaints', [ComplaintController::class, 'getProductComplaints'])->name('get-product-complaints');
+
+    Route::get('/user-permission', [SettingController::class, 'userPermissions'])->name('user-permission');
     Route::get('/unread-notification', [SettingController::class, 'unreadNotifications'])->name('unread-notification');
     Route::get('/all-notifications', [SettingController::class, 'allNotifications'])->name('all-notifications');
 
+
+    Route::get('/best-selling', [ReportController::class,'bestSellingProducts'])->name('best-selling');
+    Route::get('/get-best-selling', [ReportController::class, 'getBestSellingProducts'])->name('get-best-selling');
+
+    Route::get('/product-products', [ReportController::class,'productsOrderTotal'])->name('product-products');
+    Route::get('/get-product-products', [ReportController::class, 'getProductsOrderTotal'])->name('get-product-products');
+
+    Route::get('/earning-store', [ReportController::class,'earningOrder'])->name('earning-store');
+    Route::get('/get-earning-store', [ReportController::class, 'getEarningOrder'])->name('get-earning-store');
+
+
+    Route::resource('/contacts', ContactController::class);
+    Route::get('/get-contacts', [ContactController::class, 'getContacts'])->name('get-contacts');
 });

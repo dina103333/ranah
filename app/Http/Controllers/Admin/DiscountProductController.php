@@ -21,6 +21,9 @@ class DiscountProductController extends Controller
      */
     public function index()
     {
+        if(!in_array(119,permissions())){
+            abort(403);
+        }
         $discounts =DiscountProduct::with('Product:id,name','store:id,name')->orderBy('id','desc')->paginate(10);
         // return $discounts;
         return view('admin.product_discounts.index',compact('discounts'));
@@ -38,6 +41,9 @@ class DiscountProductController extends Controller
      */
     public function create()
     {
+        if(!in_array(120,permissions())){
+            abort(403);
+        }
         $status = DiscountProduct::getEnumValues('discounts','status');
         $types = DiscountProduct::getEnumValues('discounts','type');
         $stores = Store::where('status','تفعيل')->select('id','name')->get();
@@ -114,6 +120,9 @@ class DiscountProductController extends Controller
      */
     public function edit($discount)
     {
+        if(!in_array(121,permissions())){
+            abort(403);
+        }
         $discount =DiscountProduct::find($discount);
         $status = DiscountProduct::getEnumValues('discounts','status');
         $types = DiscountProduct::getEnumValues('discounts','type');
@@ -182,11 +191,17 @@ class DiscountProductController extends Controller
      */
     public function destroy($discount)
     {
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         DiscountProduct::find($discount)->delete();
     }
 
     public function multiDiscountsDelete(Request $request)
     {
+        if(!in_array(122,permissions())){
+            abort(403);
+        }
         $ids = $request->ids;
         DiscountProduct::whereIn('id',explode(",",$ids))->delete();
 

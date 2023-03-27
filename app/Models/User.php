@@ -55,6 +55,9 @@ class User extends Authenticatable
     public function add(){
         return $this->belongsTo(Seller::class,'seller_id');
     }
+    public function store(){
+        return $this->belongsTo(Store::class,'store_id');
+    }
 
     public function orders(){
         return $this->hasMany(Order::class);

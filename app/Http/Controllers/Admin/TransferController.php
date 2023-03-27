@@ -15,9 +15,12 @@ use Illuminate\Http\Request;
 class TransferController extends Controller
 {
     public function getStoreTransfers($store_id){
+        if(!in_array(111,permissions())){
+            abort(403);
+        }
         $transfers = Transfer::with(['stores'=>function($q){
             $q->select('id','name');
-        }])->where('to_store_id',$store_id)->where('received_from_driver',true)->where('arrived_to_store',false)->paginate(10);
+        }])->where('to_store_id',$store_id)->where('received_from_driver',true)->paginate(10);
         return view('admin.transfer.index',compact('transfers','store_id'));
     }
 
@@ -25,7 +28,7 @@ class TransferController extends Controller
     {
         $transfers = Transfer::with(['stores'=>function($q){
             $q->select('id','name');
-        }])->where('to_store_id',$store_id)->where('received_from_driver',true)->where('arrived_to_store',false);
+        }])->where('to_store_id',$store_id)->where('received_from_driver',true);
 
         return datatables($transfers)->make(true);
     }
@@ -40,6 +43,9 @@ class TransferController extends Controller
     }
 
     public function createTransferProduct($store_id){
+        if(!in_array(112,permissions())){
+            abort(403);
+        }
         $products = Product::select('id','name')->whereHas('stores',function($q) use($store_id){
             $q->where('stores.id',$store_id)
             ->where('stores_products.wholesale_quantity','!=',0);

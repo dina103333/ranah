@@ -198,7 +198,7 @@ var KTRolesList = function () {
                     render: function (data) {
                         return `
                             <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                <input class="form-check-input" type="checkbox" value="${data}" />
+                                <input class="form-check-input checkbox" type="checkbox" data-id="${data}" value="${data}" />
                             </div>`;
                     }
                 },
@@ -246,10 +246,11 @@ var KTRolesList = function () {
                     render: function (data, type, row) {
                         return `
                             <div class="d-flex">
-                                <a class="btn" href='/admin/products/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                                <a class="btn edit" href='/admin/products/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                                 <button  data-url='/admin/products/${data}'
-                                    class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
+                                class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                                 </button>
+                                <a class="btn btn-light" href='http://newranah.rana7.com/?id=${data}&title=${row.name}&type=product' class=" px-3"> رابط التطبيق</a>
                             </div>
                         `;
                     },
@@ -408,7 +409,12 @@ var KTRolesList = function () {
         });
 
         // Deleted selected rows
-        deleteSelected.addEventListener('click', function () {
+        $('.delete-all').on('click', function (e) {
+            var idsArr = [];
+            $(".checkbox:checked").each(function () {
+                idsArr.push($(this).attr('data-id'));
+            });
+            var strIds = idsArr.join(",");
             // SweetAlert2 pop up --- official docs reference: https://sweetalert2.github.io/
             Swal.fire({
                 text: "Are you sure you want to delete selected customers?",
@@ -424,37 +430,21 @@ var KTRolesList = function () {
             }).then(function (result) {
                 if (result.value) {
                     $.ajax({
-                        url: $(this).data('url'),
-                        type: 'POST',
-                        data: {
-                            _method : 'DELETE',
-                            _token : $('meta[name="csrf-token"]').attr('content')
+                        url: "/admin/multiProductsDelete",
+                        type: 'DELETE',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        data: 'ids=' + strIds,
+                        success: function (data) {
+                            console.log(data)
+                            const parent = e.target.closest('tr');
+                            datatable.row($(parent)).remove().draw();
                         },
-                        success: function (res) {
-                            Swal.fire({
-                                text: "You have deleted all selected customers!.",
-                                icon: "success",
-                                buttonsStyling: false,
-                                confirmButtonText: "Ok, got it!",
-                                customClass: {
-                                    confirmButton: "btn fw-bold btn-primary",
-                                }
-                            }).then(function () {
+                        error: function (data) {
+                            console.log(data)
+                        }
+                    });
 
-                                // Remove all selected customers
-                                checkboxes.forEach(c => {
-                                    if (c.checked) {
-                                        datatable.row($(c.closest('tbody tr'))).remove().draw();
-                                    }
-                                });
-
-                                // Remove header checked box
-                                const headerCheckbox = table.querySelectorAll('[type="checkbox"]')[0];
-                                headerCheckbox.checked = false;
-
-
-                            });
-                        }})
+                    // });
                 } else if (result.dismiss === 'cancel') {
                     Swal.fire({
                         text: "Selected customers was not deleted.",

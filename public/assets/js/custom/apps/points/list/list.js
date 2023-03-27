@@ -103,7 +103,7 @@ var KTRolesList = function () {
                     render: function (data, type, row) {
                         return `
                             <div class="d-flex">
-                                <a class="btn" href='/admin/points/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
+                                <a class="btn edit" href='/admin/points/${data}/edit' class=" px-3"><i class="fas fa-edit" style="color: #2cc3c0;"></i></a>
                                 <button  data-url='/admin/points/${data}'
                                     class="btn px-3 delete"><i class="fas fa-trash-alt" style="color:red"></i>
                                 </button>

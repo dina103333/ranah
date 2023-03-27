@@ -56,7 +56,9 @@
                             <div class="fw-bolder me-5">
                             <span class="me-2" data-kt-customer-table-select="selected_count"></span>قيد الاختيار</div>
 {{--                            <button type="button" class="btn btn-danger delete-all" data-kt-customer-table-select="delete_selected">حذف</button>--}}
-                            <button type="button" class="btn btn-danger delete-all" data-kt-customer-table-select="delete_selected">حذف</button>
+
+                            <button type="button" {{in_array(195, permissions()) ?'' : 'disabled'}}  class="btn btn-danger delete-all" data-kt-customer-table-select="delete_selected">حذف</button>
+
                         </div>
                     </div>
                 </div>
@@ -67,9 +69,11 @@
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
                                     <th class="w-10px pe-2">
-                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                            <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_customers_table .form-check-input" value="1" />
-                                        </div>
+                                        @if(in_array(195,permissions()))
+                                            <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                                <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_customers_table .form-check-input" value="1" />
+                                            </div>
+                                        @endif
                                     </th>
                                     <th class="min-w-125px">اسم المورد</th>
                                     <th class="text-end min-w-70px">الاجراءات</th>
@@ -94,6 +98,24 @@
         setTimeout(function() {
             $('.flash').fadeOut('fast');
         }, 3000);
+        $(document).ready(function(event) {
+            $.ajax({
+                type: 'get',
+                url: '/admin/user-permission',
+                success: function(response) {
+                    if ($.inArray(192, response) !== -1) {
+                        $('.edit').show();
+                    } else {
+                        $('.edit').hide();
+                    }
+                    if ($.inArray(195, response) !== -1) {
+                        $('.delete').show();
+                    } else {
+                        $('.delete').hide();
+                    }
+                }
+            });
+        });
     </script>
 <script>
     function downloadExcel() {
